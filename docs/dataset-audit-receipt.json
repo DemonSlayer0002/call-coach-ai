@@ -1,0 +1,39 @@
+{
+  "at": "2026-10-28T18:21:22.748Z",
+  "scope": "Synthetic documentation example only; no real customer data, human labels or model evaluation",
+  "schema": "private-prefix-audit-v1",
+  "ok": true,
+  "total": 1,
+  "valid": 1,
+  "invalid": 0,
+  "bytes": 979,
+  "reasons": {},
+  "provenance": {
+    "real": {
+      "total": 0,
+      "valid": 0,
+      "gold": 0,
+      "draft": 0,
+      "splits": {
+        "train": 0,
+        "dev": 0,
+        "holdout": 0
+      }
+    },
+    "synthetic": {
+      "total": 1,
+      "valid": 1,
+      "gold": 1,
+      "draft": 0,
+      "splits": {
+        "train": 0,
+        "dev": 1,
+        "holdout": 0
+      }
+    }
+  },
+  "structure_only": true,
+  "quality_verified": false,
+  "limits_reached": false,
+  "complete": true
+}

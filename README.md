@@ -46,11 +46,11 @@ npm run demo:live  # All three demo scripts through the running local server
 npm run eval:practice # Verified facts, reply feedback and appointment agreement
 ```
 
-Recorded evidence lives in `docs/synthetic-evaluation.json`, `docs/synthetic-http-smoke.json`, `docs/demo-smoke.json`, `docs/practice-evaluation.json`, and `docs/speech-smoke.json`. These are synthetic development checks, not independent real-call accuracy or acoustic acceptance. Browser visual acceptance remains a separate check.
+Recorded evidence includes [the Chromium journey](docs/browser-journey-receipt.json), [speech readiness](docs/readiness-receipt.json), and the synthetic decision/speech reports under `docs/`. These are development checks, not independent real-call accuracy or physical microphone acceptance. The browser journey uses synthetic audio through the actual AudioWorklet, GPU and Jev.
 
 ## Execution roadmap
 
-The [AMD sales coaching execution plan](docs/plans/AMD-SALES-COACH-EXECUTION.md) defines the ordered work packages, acceptance gates, data/evaluation requirements and native production rollout boundaries. The first batch is loading/readiness and actual microphone acceptance.
+The [AMD sales coaching execution plan](docs/plans/AMD-SALES-COACH-EXECUTION.md) defines the ordered work packages and native rollout boundaries. [Execution status and receipts](docs/plans/EXECUTION-STATUS.md) distinguish delivered code, synthetic browser acceptance and the remaining physical/real-call gates.
 
 ## Integration
 

@@ -1,6 +1,6 @@
 # AMD sales coaching execution plan
 
-Status: execution proposal, not implementation or production activation.
+Status: execution started. See [work-package status and receipts](EXECUTION-STATUS.md). Production activation remains gated.
 
 Prepared: 2026-10-28. Baseline source: `3609115` in the sales-coach fork. Recheck runtime evidence before each rollout.
 
