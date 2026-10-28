@@ -69,3 +69,11 @@ test('unclear speech keeps the question open and permits another reply',async()=
  assert.equal(f.states.at(-1).phase,'unclear');assert.equal(f.states.at(-1).canAdvance,false);
  await f.callbacks().onText('rep','A clear answer');assert.equal(f.states.at(-1).canAdvance,true);await f.voice.stop();
 });
+test('permission denial gives a specific recovery and stopping during speech setup closes the mic',async()=>{
+ const denied=fixture({getMic:async()=>{throw Object.assign(new Error('native private'),{name:'NotAllowedError'});}});
+ await denied.voice.start(['Question?']);assert.match(denied.errors[0],/site permissions/);assert.doesNotMatch(denied.errors[0],/native private/);
+ const pending=deferred();let starts=0;
+ const f=fixture({prepareSpeech:()=>pending.promise,startSession:async()=>{starts++;}});
+ const starting=f.voice.start(['Question?']);await flush();await f.voice.stop();assert.equal(f.track.stopped,true);
+ pending.resolve({backend:'gpu'});await starting;assert.equal(starts,0);assert.equal(f.voice.isActive(),false);
+});

@@ -6,7 +6,7 @@ Open **http://localhost:3137** in Chrome or Edge on this workstation. The key is
 
 1. Pick **Price objection**, **Vehicle history**, or **Book a visit**.
 2. Open **Demo facts you can use**. These are the approved sample facts for that exercise, not actual dealership inventory or prices.
-3. Press **Practice out loud** and allow microphone access. No screen share or phone call is required. The configured VoiceClaude mode uses the existing recognition service, so no browser model download is needed. Wait for the listening message.
+3. Choose your microphone under **Audio setup** and use **Check customer audio** to test your headphones. Press **Practice out loud** and allow microphone access. Setup tests VoiceClaude with a synthetic speech phrase before opening the exercise; service availability and a passed speech test are shown separately. No screen share or phone call is required. Wait for the listening message.
 4. Hear the customer's question, then answer naturally. Pause briefly when finished. Your words appear as the rep's transcript, and Jev updates the suggested next move, reply feedback and checkpoints.
 5. Review the guidance. You can add more to your answer. When the reply is transcribed, press **Hear next question**. Use **Repeat question** if needed.
 6. Finish the last answer and press **Finish practice**, or use **End practice** at any time. The microphone is turned off and the transcript stays visible for review.
@@ -46,4 +46,18 @@ An agreed appointment in this demo is a conversation checkpoint. It does **not**
 
 ## Verification limits
 
-Offline lifecycle/contract tests, synthetic real-Jev scenarios, and synthesized audio through the real CPU recognizer have been exercised. Physical microphone pickup, browser voice availability, WebGPU/WASM execution, visual rendering, and a production phone call still require checking on the actual browser/device. No connected browser was available to the coding session. These limits are not replaced by the test count.
+The updated demo was rendered and exercised in Chromium with synthetic WebAudio microphone input, the actual AudioWorklet, the running GPU service and real Jev inference. Permission refusal, disconnected recognition, reply capture, question advancement and stop were exercised. Desktop and mobile layouts were inspected. See [the browser receipt](browser-journey-receipt.json).
+
+Physical microphone pickup, whether you actually hear playback, optional browser WebGPU/WASM recognition, and a production phone call still require their own checks. The synthetic browser run does not establish real-call accuracy or latency percentiles.
+
+Use **Download diagnostics** after a problem. Its bounded report contains setup states, random session ID, segment numbers, timing and coded microphone failures. It excludes audio, transcript text, keys, device names and device identifiers. No diagnostic upload is automatic. Last-voice-to-cue timing is explicitly an estimate from worklet frame silence and browser presentation timing; physical device latency is unmeasured.
+
+To repeat the automated browser journey with the Playwright CLI installed and this local server running:
+
+```sh
+playwright-cli -s=jev-acceptance open http://localhost:3137
+playwright-cli -s=jev-acceptance --raw run-code --filename=tools/browser-journey.js
+playwright-cli -s=jev-acceptance close
+```
+
+This uses simulated microphone input and paid synthetic inference. It replaces microphone methods only inside its isolated browser page. It writes screenshots and sanitized diagnostics under `/tmp`, and exits with an error if a journey check fails.

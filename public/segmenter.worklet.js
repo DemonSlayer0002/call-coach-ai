@@ -51,6 +51,7 @@ class Segmenter extends AudioWorkletProcessor {
       open: false,
       chunks: [], levels: [], active: [],
       start: 0, above: 0, silence: 0, speech: 0,
+      lastVoiced: 0,
       talking: false, sinceSnapshot: 0,
       level: new Float32Array(HISTORY),
       speaking: new Uint8Array(HISTORY),
@@ -87,6 +88,7 @@ class Segmenter extends AudioWorkletProcessor {
     const rms = Math.sqrt(sum / FRAME);
     const thr = Math.max(ABS_MIN, s.floor * FLOOR_MULT);
     const loud = rms >= (s.open ? thr * RELEASE : thr);
+    if (loud) s.lastVoiced = this.frame;
     const frame = s.buf.slice();
 
     const h = this.frame % HISTORY;
@@ -156,7 +158,7 @@ class Segmenter extends AudioWorkletProcessor {
 
     const pcm = new Float32Array((to - from) * FRAME);
     for (let k = from; k < to; k++) pcm.set(chunks[k], (k - from) * FRAME);
-    this.port.postMessage({ type: "segment", input: i, pcm, startFrame: s.start + from, endFrame, echo }, [pcm.buffer]);
+    this.port.postMessage({ type: "segment", input: i, pcm, startFrame: s.start + from, endFrame, endpoint_ms: (this.frame - s.lastVoiced) * 30, echo }, [pcm.buffer]);
   }
 
   // Does this segment contain anything besides the reference input played back

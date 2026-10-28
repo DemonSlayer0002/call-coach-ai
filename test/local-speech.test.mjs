@@ -63,3 +63,15 @@ test('GPU connection failure falls back without exposing the native error',async
  }});
  const result=await client.transcribe(Buffer.alloc(1600));assert.equal(result.text,'Recovered');assert.equal(result.fallback_reason,'gpu_unavailable');
 });
+test('GPU deadline releases recognition to fallback; overall deadline remains bounded',async()=>{
+ const calls=[];
+ const client=createLocalSpeechClient({gpuUrl:'http://127.0.0.1:47212',gpuTimeoutMs:5,timeoutMs:100,fetchImpl:async(url,options)=>{
+  calls.push(new URL(url).port);
+  if(new URL(url).port==='47212')return new Promise((_,reject)=>options.signal.addEventListener('abort',()=>reject(options.signal.reason),{once:true}));
+  return Response.json({text:'Fallback success'});
+ }});
+ // AbortSignal.timeout is intentionally unref'd; retain a handle while testing it.
+ const keepAlive=setTimeout(()=>{},200);
+ try{const result=await client.transcribe(Buffer.alloc(1600));assert.equal(result.fallback_reason,'gpu_timeout');assert.equal(result.speech_backend,'local');assert.deepEqual(calls,['47212','8910']);}
+ finally{clearTimeout(keepAlive);}
+});

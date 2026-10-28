@@ -1,0 +1,79 @@
+{
+  "at": "2026-10-28T18:17:59.620063+00:00",
+  "scope": "Bundled synthetic speech through shipped AudioWorklet DSP in Node VM; no microphone, ASR accuracy or role proof",
+  "passed": true,
+  "fixtures": [
+    {
+      "fixture": "history-0.wav",
+      "input_ms": 7800,
+      "segments": 1,
+      "retained_ms": 7740
+    },
+    {
+      "fixture": "history-1.wav",
+      "input_ms": 4933,
+      "segments": 1,
+      "retained_ms": 4860
+    },
+    {
+      "fixture": "history-2.wav",
+      "input_ms": 5207,
+      "segments": 1,
+      "retained_ms": 5100
+    },
+    {
+      "fixture": "history-3.wav",
+      "input_ms": 6577,
+      "segments": 1,
+      "retained_ms": 6510
+    },
+    {
+      "fixture": "price-0.wav",
+      "input_ms": 7231,
+      "segments": 1,
+      "retained_ms": 7140
+    },
+    {
+      "fixture": "price-1.wav",
+      "input_ms": 4878,
+      "segments": 1,
+      "retained_ms": 4830
+    },
+    {
+      "fixture": "price-2.wav",
+      "input_ms": 12614,
+      "segments": 1,
+      "retained_ms": 12000
+    },
+    {
+      "fixture": "price-3.wav",
+      "input_ms": 7948,
+      "segments": 1,
+      "retained_ms": 7890
+    },
+    {
+      "fixture": "visit-0.wav",
+      "input_ms": 6319,
+      "segments": 1,
+      "retained_ms": 6240
+    },
+    {
+      "fixture": "visit-1.wav",
+      "input_ms": 5358,
+      "segments": 1,
+      "retained_ms": 5310
+    },
+    {
+      "fixture": "visit-2.wav",
+      "input_ms": 5498,
+      "segments": 1,
+      "retained_ms": 5430
+    },
+    {
+      "fixture": "visit-3.wav",
+      "input_ms": 5705,
+      "segments": 1,
+      "retained_ms": 5580
+    }
+  ]
+}

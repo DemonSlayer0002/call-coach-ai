@@ -46,9 +46,10 @@ export async function getCallAudio() {
   return stream;
 }
 
-export function getMicAudio() {
+export function getMicAudio(deviceId) {
+  if (!navigator.mediaDevices?.getUserMedia) throw new Error('Microphone capture requires localhost or HTTPS in a supported browser.');
   return navigator.mediaDevices.getUserMedia({
-    audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+    audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true, ...(deviceId ? { deviceId: { exact: deviceId } } : {}) },
   });
 }
 
@@ -68,10 +69,11 @@ export function getMicAudio() {
  * Returns { stop(), settled() }.
  */
 export async function startSession(sources, handlers = {}) {
-  const { onSegment = () => {}, onText = () => {}, onDrop = () => {}, onBehind = () => {}, onError = () => {}, onEnded = () => {} } = handlers;
+  const { onDiagnostic = () => {}, onSegment = () => {}, onText = () => {}, onDrop = () => {}, onBehind = () => {}, onError = () => {}, onEnded = () => {} } = handlers;
   const { onPartial = () => {}, onVoice = () => {}, onLevel = () => {} } = handlers;
   const ctx = new AudioContext({ sampleRate: SAMPLE_RATE });
   let running = true;
+  const abort = new AbortController();
 
   try {
     await ctx.audioWorklet.addModule("/segmenter.worklet.js");
@@ -110,13 +112,14 @@ export async function startSession(sources, handlers = {}) {
       let off = 0;
       for (const p of parts) { pcm.set(p, off); off += p.length; }
       try {
-        const recognition = await transcribe(pcm);
+        onDiagnostic('asr_start', { sequence: lastSequence });
+        const recognition = await transcribe(pcm, { signal: abort.signal });
+        onDiagnostic('asr_end', { sequence: lastSequence, backend: recognition.speech_backend, duration_ms: recognition.latency_ms });
         const text = recognition.text.trim();
         if (text && !isHallucination(text)) onText(speaker, text, { sequence: lastSequence, speech_backend: recognition.speech_backend, latency_ms: recognition.latency_ms }); // includes segments flushed by stop()
         else onDrop(speaker, "noise");
       } catch (err) {
-        console.error("Transcription error:", err);
-        onError(err.message);
+        if (!abort.signal.aborted) onError(err.message);
       }
       busy = false;
       if (warned && !queue.length) { warned = false; onBehind(0); }
@@ -132,7 +135,7 @@ export async function startSession(sources, handlers = {}) {
       partialBusy = true;
       const asked = finals;
       try {
-        const text = (await transcribe(pcm, { quick: true })).text.trim();
+        const text = (await transcribe(pcm, { quick: true, signal: abort.signal })).text.trim();
         if (running && asked === finals && text && !isHallucination(text)) onPartial(speaker, text);
       } catch {}
       partialBusy = false;
@@ -143,10 +146,11 @@ export async function startSession(sources, handlers = {}) {
       const { type, input, pcm, echo } = e.data;
       const speaker = sources[input].speaker;
       if (type === "level") { onLevel(speaker, e.data.level); return; }
-      if (type === "vad") { onVoice(speaker, e.data.on); return; }
+      if (type === "vad") { onDiagnostic(e.data.on ? 'speech_on' : 'speech_off'); onVoice(speaker, e.data.on); return; }
       if (type === "partial") { partial(speaker, pcm); return; }
       if (echo?.dropped) { onDrop(speaker, "echo", echo); return; }
       finals++;
+      onDiagnostic('segment', { sequence: finals, endpoint_ms: e.data.endpoint_ms });
       onSegment(speaker, finals);
       queue.push({ speaker, pcm, sequence: finals });
       if (queue.length >= BEHIND_AT && !warned) { warned = true; onBehind(queue.length); }
@@ -158,9 +162,8 @@ export async function startSession(sources, handlers = {}) {
     return {
       async stop() {
         if (!running) return;
-        node.port.postMessage("flush"); // send whatever was mid-sentence
-        await new Promise((r) => setTimeout(r, 150));
         running = false;
+        abort.abort(); queue.length = 0; settle();
         ctx.close().catch(() => {});
         for (const s of sources) s.stream.getTracks().forEach((t) => t.stop());
       },
@@ -171,6 +174,7 @@ export async function startSession(sources, handlers = {}) {
     };
   } catch (err) {
     running = false;
+    abort.abort();
     ctx.close().catch(() => {});
     throw err;
   }

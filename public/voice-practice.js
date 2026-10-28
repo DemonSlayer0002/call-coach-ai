@@ -1,7 +1,8 @@
 import { createOwnedCapture } from './owned-capture.js';
+import { microphoneError } from './diagnostics.js';
 
 // Microphone-only rehearsal. The customer's voice is muted out of the mic lane.
-export function createVoicePractice({ getMic, prepareSpeech, startSession, speak, onTurn, onState = () => {}, onError = () => {} }) {
+export function createVoicePractice({ getMic, prepareSpeech, startSession, speak, onTurn, onState = () => {}, onSetup = () => {}, onDiagnostic = () => {}, onError = () => {} }) {
   const capture = createOwnedCapture(startSession);
   let active = null;
   function emit(op, phase = op.phase) {
@@ -14,6 +15,7 @@ export function createVoicePractice({ getMic, prepareSpeech, startSession, speak
   async function stop(notify = true) {
     const previous = active; active = null;
     if (previous) {
+      onDiagnostic('stopped');
       previous.abort.abort(); previous.stream?.getTracks().forEach(track => track.stop());
       if (notify) emit(previous, 'ended');
     }
@@ -33,16 +35,23 @@ export function createVoicePractice({ getMic, prepareSpeech, startSession, speak
     const cleanup = stop(false);
     const op = { questions, index: 0, replied: false, hearing: false, processing: 0, talking: true, abort: new AbortController(), stream: null, phase: 'preparing', spoken: false, voiceRevision: 0, deliveredRevision: -1, segments: new Map(), session: null };
     active = op; emit(op);
+    onDiagnostic('setup');
     try {
       await cleanup;
       if (active !== op) return;
-      const stream = await getMic();
+      onSetup('microphone'); onDiagnostic('mic_requested');
+      let stream;
+      try { stream = await getMic(); }
+      catch (err) { const failure = microphoneError(err); onDiagnostic('failed', { code: failure.code }); throw new Error(failure.message); }
       if (active !== op) { stream.getTracks().forEach(track => track.stop()); return; }
       op.stream = stream; mute(op, true);
+      onDiagnostic('mic_ready'); onSetup('speech'); onDiagnostic('speech_check');
       const speech = await prepareSpeech({ signal: op.abort.signal });
       op.backend = speech?.backend;
       if (active !== op) return;
+      onDiagnostic('speech_ready', { backend: op.backend }); onSetup('capture', speech);
       const session = await capture.start([{ stream, speaker: 'rep', watch: true }], {
+        onDiagnostic,
         onSegment: (_speaker, sequence) => { if (active === op && !op.talking) op.segments.set(sequence, op.voiceRevision); },
         onText: async (_speaker, text, metadata = {}) => {
           if (active !== op || op.talking) return;

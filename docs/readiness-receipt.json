@@ -1,0 +1,29 @@
+{
+  "at": "2026-10-28T18:12:36.664Z",
+  "scope": "synthetic speech warmup through actual local demo HTTP route; no microphone or physical browser acceptance",
+  "results": [
+    {
+      "status": 200,
+      "client_ms": 654,
+      "ready": true,
+      "warmed": true,
+      "backend": "gpu",
+      "model": "large-v3-turbo",
+      "checked_at": 1793211156592,
+      "latency_ms": 488,
+      "cached": false
+    },
+    {
+      "status": 200,
+      "client_ms": 58,
+      "ready": true,
+      "warmed": true,
+      "backend": "gpu",
+      "model": "large-v3-turbo",
+      "checked_at": 1793211156592,
+      "latency_ms": 488,
+      "cached": true,
+      "busy": false
+    }
+  ]
+}

@@ -10,9 +10,13 @@ export const BROWSER_MODELS = [
 ];
 const MODEL_KEY = "cc-browser-asr";
 
-let where = null;
-export function speechLocation() {
-  where ??= fetch("/api/health").then((r) => r.json()).then((h) => h.transcribe || "server").catch(() => "server");
+let where = null, checkedAt = 0;
+export async function speechLocation({ refresh = false } = {}) {
+  if (!where || refresh || Date.now() - checkedAt > 10000) {
+    const response = await fetch('/api/health', { signal: AbortSignal.timeout(5000), cache: 'no-store' });
+    if (!response.ok) throw new Error('Cannot check the speech configuration. Check the local server, then retry.');
+    where = (await response.json()).transcribe || 'server'; checkedAt = Date.now();
+  }
   return where;
 }
 
@@ -62,34 +66,42 @@ function getWorker() {
 }
 
 /** Returns { text }, or throws. `quick` asks for the fast model, for live transcripts. */
-export async function transcribe(pcm, { quick = false } = {}) {
+export async function transcribe(pcm, { quick = false, signal } = {}) {
+  signal?.throwIfAborted();
   const place = await speechLocation();
+  signal?.throwIfAborted();
   if (place === "off") throw new Error("Speech recognition is turned off on this server.");
   if (place === "browser") {
     return new Promise((resolve, reject) => {
       const id = ++nextId;
+      const cleanup = () => { clearTimeout(timer); signal?.removeEventListener('abort', cancel); pending.delete(id); };
+      const cancel = () => { cleanup(); reject(signal.reason); };
       const timer = setTimeout(() => resetWorker("Speech recognition took too long. End practice and try again with the faster model."), 45000);
       pending.set(id, {
-        resolve: value => { clearTimeout(timer); resolve(value); },
-        reject: err => { clearTimeout(timer); reject(err); },
+        resolve: value => { cleanup(); resolve(value); },
+        reject: err => { cleanup(); reject(err); },
       });
+      signal?.addEventListener('abort', cancel, { once: true });
       try { getWorker().postMessage({ id, pcm, model: browserModel() }, [pcm.buffer]); }
-      catch (err) { clearTimeout(timer); pending.delete(id); reject(err); }
+      catch (err) { cleanup(); reject(err); }
     });
   }
-  const res = await fetch(`/api/transcribe${quick ? "?quick=1" : ""}`, { method: "POST", headers: { "Content-Type": "application/octet-stream" }, body: pcm.buffer });
+  const deadline = AbortSignal.timeout(50000);
+  const res = await fetch(`/api/transcribe${quick ? "?quick=1" : ""}`, { method: "POST", headers: { "Content-Type": "application/octet-stream" }, body: pcm.buffer.slice(pcm.byteOffset, pcm.byteOffset + pcm.byteLength), signal: signal ? AbortSignal.any([signal, deadline]) : deadline });
   const data = await res.json();
-  if (data.error) throw new Error(data.error);
+  if (!res.ok || data.error) throw new Error(data.error || 'Speech recognition returned HTTP ' + res.status + '.');
   return { text: data.text || "", speech_backend: data.speech_backend, speech_model: data.speech_model, latency_ms: data.latency_ms };
 }
 
 // Warm the model before asking someone to speak; abort stops the waiting caller.
 export async function prepareSpeech({ signal } = {}) {
-  const place = await speechLocation();
+  signal?.throwIfAborted();
+  const place = await speechLocation({ refresh: true });
+  signal?.throwIfAborted();
   if (place === "off") throw new Error("Speech recognition is turned off on this server.");
   if (place === "voiceclaude") {
-    const timeout = AbortSignal.timeout(5000);
-    const response = await fetch("/api/speech/health", { signal: signal ? AbortSignal.any([signal, timeout]) : timeout });
+    const timeout = AbortSignal.timeout(50000);
+    const response = await fetch("/api/speech/prepare", { method: 'POST', signal: signal ? AbortSignal.any([signal, timeout]) : timeout });
     const data = await response.json();
     if (!response.ok || !data.ready) throw new Error(data.error || "VoiceClaude speech recognition is unavailable.");
     return data;

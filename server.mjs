@@ -6,6 +6,7 @@ import os from "node:os";
 import { createLiveTranscriptStore, authorizeLiveIngest } from "./lib/live-transcript.mjs";
 import { expectedOrigin } from "./lib/web.mjs";
 import { createLocalSpeechClient } from "./lib/local-speech.mjs";
+import { createSpeechReadiness } from "./lib/speech-readiness.mjs";
 import {
   HOSTED, TRANSCRIBE, MAX_BODY_BYTES, TOO_MANY,
   getModes, listModes, health, evaluate, clientIp, overLimit, accessSummary,
@@ -22,6 +23,7 @@ const liveTranscripts = createLiveTranscriptStore();
 const BIND_HOST = process.env.BIND_HOST || (HOSTED ? "0.0.0.0" : "127.0.0.1");
 let ASR_MODEL = TRANSCRIBE === "voiceclaude" ? "large-v3-turbo" : process.env.ASR_MODEL || "onnx-community/whisper-base.en";
 const localSpeech = TRANSCRIBE === "voiceclaude" ? createLocalSpeechClient({ url: process.env.VOICECLAUDE_URL || "http://127.0.0.1:8910", gpuUrl: process.env.VOICECLAUDE_GPU_URL || "" }) : null;
+const speechReadiness = localSpeech && createSpeechReadiness({ client: localSpeech, loadFixture: () => readFile(path.join(PUBLIC, 'demo-audio/price-0.wav')) });
 
 // Where downloaded speech models go. The desktop app points this at its user data
 // folder, since the install folder is read-only.
@@ -195,8 +197,13 @@ const server = http.createServer(async (req, res) => {
     if (req.method === "GET" && url.pathname === "/api/speech/health") {
       if (!localSpeech || HOSTED) return sendJson(res, 404, { ready: false, error: "Local VoiceClaude speech is not enabled." });
       const speech = await localSpeech.status();
-      return sendJson(res, speech.ready ? 200 : 503, { ...speech, provider: "VoiceClaude", model: ASR_MODEL,
+      return sendJson(res, speech.ready ? 200 : 503, { ...speech, warmed: false, provider: "VoiceClaude",
         ...(speech.ready ? {} : { error: "The local VoiceClaude speech service is unavailable. Start it, then retry practice." }) });
+    }
+    if (req.method === "POST" && url.pathname === "/api/speech/prepare") {
+      if (!speechReadiness || HOSTED) return sendJson(res, 404, { error: "Local VoiceClaude speech is not enabled." });
+      if (overLimit(clientIp(header, req.socket.remoteAddress))) return sendJson(res, 429, TOO_MANY);
+      return sendJson(res, 200, await speechReadiness.prepare());
     }
     if (localSpeech && url.pathname.startsWith("/api/models")) {
       return sendJson(res, 404, { error: "The speech model is managed by the existing VoiceClaude service." });
