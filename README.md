@@ -48,6 +48,10 @@ npm run eval:practice # Verified facts, reply feedback and appointment agreement
 
 Recorded evidence lives in `docs/synthetic-evaluation.json`, `docs/synthetic-http-smoke.json`, `docs/demo-smoke.json`, `docs/practice-evaluation.json`, and `docs/speech-smoke.json`. These are synthetic development checks, not independent real-call accuracy or acoustic acceptance. Browser visual acceptance remains a separate check.
 
+## Execution roadmap
+
+The [AMD sales coaching execution plan](docs/plans/AMD-SALES-COACH-EXECUTION.md) defines the ordered work packages, acceptance gates, data/evaluation requirements and native production rollout boundaries. The first batch is loading/readiness and actual microphone acceptance.
+
 ## Integration
 
 The local transcript adapter accepts authenticated `session_start`, role-tagged `segment`, and `session_end` events. It separates customer/staff roles, ignores interim revisions, deduplicates finals, reports coverage gaps and keeps bounded, expiring state in memory.
