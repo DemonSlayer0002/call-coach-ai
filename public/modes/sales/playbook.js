@@ -1,4 +1,6 @@
 export const PLAYBOOK = {
+  config: { minActionConfidence: 0.35, minMargin: 0.1, actionMinScore: { send_proposal: 0.7 } },
+
   stages: ["Just browsing", "Exploring options", "Evaluating us", "Ready to buy"],
 
   actions: {
@@ -39,6 +41,38 @@ export const PLAYBOOK = {
     handle_objection: {
       title: "Address the concern",
       tips: {
+        choices: [
+          {
+            "question": "objection_type",
+            "option": "price",
+            "text": "Ask: “Is the concern the total cost, cash flow, or the value you expect?” Clarify before offering any concession."
+          },
+          {
+            "question": "objection_type",
+            "option": "timing",
+            "text": "Ask: “What would need to change for the timing to work?” Agree on a realistic next contact."
+          },
+          {
+            "question": "objection_type",
+            "option": "competitor",
+            "text": "Ask: “Which part of their offer works better for you?” Compare verified terms without criticizing the competitor."
+          },
+          {
+            "question": "objection_type",
+            "option": "trust",
+            "text": "Ask: “What would you need to verify to feel comfortable?” Offer evidence you can actually provide."
+          },
+          {
+            "question": "objection_type",
+            "option": "fit",
+            "text": "Ask: “Which requirement does this miss?” Check the requirement before claiming a fit."
+          },
+          {
+            "question": "objection_type",
+            "option": "authority",
+            "text": "Ask: “Who else should be part of this decision, and what will matter to them?”"
+          }
+        ],
         when: [
           { signal: "has_blocking_objection", text: "There’s a blocking concern. Repeat it in their words, then answer it directly." },
         ],
@@ -51,8 +85,8 @@ export const PLAYBOOK = {
       title: "Send the proposal",
       tips: {
         when: [
-          { signal: "discusses_budget", text: "Budget is confirmed — move straight to the formal quote." },
-          { signal: "decision_maker_involved", text: "The approver is on board. Lock it in with a proposal." },
+          { signal: "discusses_budget", text: "They discussed budget. Confirm the amount and constraints before preparing a quote." },
+          { signal: "decision_maker_involved", text: "An approver may be involved. Confirm who authorizes the purchase and the next step." },
         ],
         always: [
           "They’re ready. Confirm the details and tell them when the quote or contract will arrive.",
@@ -62,6 +96,33 @@ export const PLAYBOOK = {
     ask_discovery_question: {
       title: "Ask a discovery question",
       tips: {
+        choices: [
+          {
+            "question": "qualification_gap",
+            "option": "need",
+            "text": "Ask: “What are you trying to accomplish, and what matters most?”"
+          },
+          {
+            "question": "qualification_gap",
+            "option": "impact",
+            "text": "Ask: “How is that affecting you today?”"
+          },
+          {
+            "question": "qualification_gap",
+            "option": "timeline",
+            "text": "Ask: “When would you ideally want this in place?”"
+          },
+          {
+            "question": "qualification_gap",
+            "option": "budget",
+            "text": "Ask: “What spending range or constraints should we work within?”"
+          },
+          {
+            "question": "qualification_gap",
+            "option": "approval",
+            "text": "Ask: “Who else will help make the decision?”"
+          }
+        ],
         when: [],
         always: [
           "Find out what problem they’re solving and what happens if they don’t solve it.",

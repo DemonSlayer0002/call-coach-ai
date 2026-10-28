@@ -1,0 +1,234 @@
+[
+  {
+    "id": "sales-pricing",
+    "mode": "sales",
+    "turns": [
+      {
+        "speaker": "customer",
+        "text": "What does this cost for twenty people? Is there an annual discount?"
+      }
+    ],
+    "expected_actions": [
+      "send_pricing"
+    ],
+    "expected_objection": "none"
+  },
+  {
+    "id": "sales-price-blocker",
+    "mode": "sales",
+    "turns": [
+      {
+        "speaker": "customer",
+        "text": "That price is beyond our budget. We cannot proceed at that cost."
+      }
+    ],
+    "expected_actions": [
+      "handle_objection"
+    ],
+    "expected_objection": "price"
+  },
+  {
+    "id": "sales-approver",
+    "mode": "sales",
+    "turns": [
+      {
+        "speaker": "customer",
+        "text": "I want this but my director has to approve. Can we get her on a call?"
+      }
+    ],
+    "expected_actions": [
+      "loop_in_decision_maker"
+    ],
+    "expected_objection": "authority"
+  },
+  {
+    "id": "sales-ready",
+    "mode": "sales",
+    "turns": [
+      {
+        "speaker": "customer",
+        "text": "We have approved the budget, I can sign, and all our questions are answered. Please send the contract today."
+      }
+    ],
+    "expected_actions": [
+      "send_proposal"
+    ],
+    "expected_objection": "none"
+  },
+  {
+    "id": "sales-follow-up",
+    "mode": "sales",
+    "turns": [
+      {
+        "speaker": "customer",
+        "text": "We are interested but cannot buy until next quarter. Please call me in January."
+      }
+    ],
+    "expected_actions": [
+      "nurture_follow_up"
+    ],
+    "expected_objection": "timing"
+  },
+  {
+    "id": "sales-wrong-number",
+    "mode": "sales",
+    "turns": [
+      {
+        "speaker": "customer",
+        "text": "Sorry, wrong number. I was trying to call the pharmacy."
+      }
+    ],
+    "expected_actions": [
+      "no_action"
+    ],
+    "expected_objection": "none"
+  },
+  {
+    "id": "auto-needs",
+    "mode": "automotive",
+    "turns": [
+      {
+        "speaker": "customer",
+        "text": "I am starting to look for a car but have no idea what would suit me. Can you help me figure it out?"
+      }
+    ],
+    "expected_actions": [
+      "ask_discovery_question"
+    ],
+    "expected_objection": "none"
+  },
+  {
+    "id": "auto-availability",
+    "mode": "automotive",
+    "turns": [
+      {
+        "speaker": "customer",
+        "text": "Is the blue 2020 SUV on your website still available?"
+      }
+    ],
+    "expected_actions": [
+      "verify_vehicle"
+    ],
+    "expected_objection": "none"
+  },
+  {
+    "id": "auto-total-price",
+    "mode": "automotive",
+    "turns": [
+      {
+        "speaker": "customer",
+        "text": "What is the complete out-the-door total with every tax and fee?"
+      }
+    ],
+    "expected_actions": [
+      "explain_price"
+    ],
+    "expected_objection": "none"
+  },
+  {
+    "id": "auto-financing",
+    "mode": "automotive",
+    "turns": [
+      {
+        "speaker": "customer",
+        "text": "How does applying for financing work, and what down payment would I need?"
+      }
+    ],
+    "expected_actions": [
+      "explain_finance"
+    ],
+    "expected_objection": "none"
+  },
+  {
+    "id": "auto-trade",
+    "mode": "automotive",
+    "turns": [
+      {
+        "speaker": "customer",
+        "text": "I have a 2018 sedan to trade. How do you work out the trade-in value?"
+      }
+    ],
+    "expected_actions": [
+      "discuss_trade"
+    ],
+    "expected_objection": "none"
+  },
+  {
+    "id": "auto-history",
+    "mode": "automotive",
+    "turns": [
+      {
+        "speaker": "customer",
+        "text": "The accident history worries me. I will not move forward until I see the history report."
+      }
+    ],
+    "expected_actions": [
+      "handle_objection"
+    ],
+    "expected_objection": "trust"
+  },
+  {
+    "id": "auto-visit",
+    "mode": "automotive",
+    "turns": [
+      {
+        "speaker": "customer",
+        "text": "I want to come test drive the silver sedan. Is Saturday at ten available?"
+      }
+    ],
+    "expected_actions": [
+      "book_visit"
+    ],
+    "expected_objection": "none"
+  },
+  {
+    "id": "auto-other-buyer",
+    "mode": "automotive",
+    "turns": [
+      {
+        "speaker": "customer",
+        "text": "I like it but my wife needs to be part of the decision before we proceed. Can we include her?"
+      }
+    ],
+    "expected_actions": [
+      "include_buyer"
+    ],
+    "expected_objection": "authority"
+  },
+  {
+    "id": "auto-wrong-number",
+    "mode": "automotive",
+    "turns": [
+      {
+        "speaker": "customer",
+        "text": "You have the wrong number. I am not shopping for a car."
+      }
+    ],
+    "expected_actions": [
+      "no_action"
+    ],
+    "expected_objection": "none"
+  },
+  {
+    "id": "auto-resolved-objection",
+    "mode": "automotive",
+    "turns": [
+      {
+        "speaker": "customer",
+        "text": "I will not visit until I understand the vehicle history."
+      },
+      {
+        "speaker": "rep",
+        "text": "We have sent you the available history report for review."
+      },
+      {
+        "speaker": "customer",
+        "text": "I have read it. That resolves my concern, and I want to test drive it tomorrow. What visit times are available?"
+      }
+    ],
+    "expected_actions": [
+      "book_visit"
+    ],
+    "expected_objection": "none"
+  }
+]

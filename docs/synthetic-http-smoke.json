@@ -1,0 +1,19 @@
+{
+  "checked_at": "2026-10-28T16:50:20.117Z",
+  "scope": "Synthetic role-tagged HTTP ingestion through local backend and real Jev inference. No PBX audio or production call used.",
+  "passed": true,
+  "segments": 2,
+  "contact_masking_verified": true,
+  "model": "jev-1.14.0",
+  "action": "verify_vehicle",
+  "original_probability": 1,
+  "latency_ms": 313,
+  "trace": {
+    "contract_hash": "314e96dbbbe597ce313cbb4eccfee4c0d23311e72ee9299faff0f8f1f405e804",
+    "state_hash": "b8412b801acda9b4e9df7084838ee4d1f74a9cbf679b2b06232513e1f2d8568d"
+  },
+  "usage": {
+    "input_tokens": 1913,
+    "output_tokens": 374
+  }
+}

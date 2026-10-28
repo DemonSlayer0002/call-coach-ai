@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import os from "node:os";
+import { createLiveTranscriptStore, authorizeLiveIngest } from "./lib/live-transcript.mjs";
 import {
   HOSTED, TRANSCRIBE, MAX_BODY_BYTES, TOO_MANY,
   getModes, listModes, health, evaluate, clientIp, overLimit, accessSummary,
@@ -15,6 +16,7 @@ import {
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC = path.join(HERE, "public");
 const PORT = Number(process.env.PORT || 3000);
+const liveTranscripts = createLiveTranscriptStore();
 const BIND_HOST = process.env.BIND_HOST || (HOSTED ? "0.0.0.0" : "127.0.0.1");
 let ASR_MODEL = process.env.ASR_MODEL || "onnx-community/whisper-base.en";
 
@@ -164,8 +166,27 @@ const server = http.createServer(async (req, res) => {
     const serverSpeech = TRANSCRIBE === "server";
     const header = (name) => req.headers[name];
 
+    if (url.pathname === "/api/internal/live-stt/events" || url.pathname.startsWith("/api/live/")) {
+      // Local-only until a hosted deployment supplies proper staff authentication.
+      if (HOSTED || !["127.0.0.1", "::1", "::ffff:127.0.0.1"].includes(req.socket.remoteAddress)) {
+        return sendJson(res, 403, { error: "Live transcripts are available only on the local workstation." });
+      }
+      if (req.method === "POST" && url.pathname === "/api/internal/live-stt/events") {
+        authorizeLiveIngest(header, process.env.AMD_LIVE_STT_INGEST_TOKEN || "");
+        return sendJson(res, 200, liveTranscripts.ingest(await readJson(req)));
+      }
+      if (req.method === "GET" && url.pathname === "/api/live/sessions") {
+        return sendJson(res, 200, { sessions: liveTranscripts.list() });
+      }
+      if (req.method === "GET" && url.pathname.startsWith("/api/live/sessions/")) {
+        const session = liveTranscripts.get(url.pathname.slice("/api/live/sessions/".length));
+        return sendJson(res, session ? 200 : 404, session || { error: "Live transcript session not found or expired." });
+      }
+      return sendJson(res, 405, { error: "Method not allowed." });
+    }
+
     if (req.method === "GET" && url.pathname === "/api/health") {
-      return sendJson(res, 200, { ...health(), asrModel: ASR_MODEL });
+      return sendJson(res, 200, { ...health(), asrModel: ASR_MODEL, liveIngest: Boolean(process.env.AMD_LIVE_STT_INGEST_TOKEN) && !HOSTED });
     }
 
     if (req.method === "GET" && url.pathname === "/api/modes") {
@@ -253,12 +274,12 @@ const server = http.createServer(async (req, res) => {
 
     sendJson(res, 404, { error: "Not found" });
   } catch (err) {
-    sendJson(res, 500, { error: err.message || "Unexpected server error." });
+    sendJson(res, err.status || 500, { error: err.message || "Unexpected server error." });
   }
 });
 
 server.listen(PORT, BIND_HOST, () => {
-  console.log(`Call Coach running at http://localhost:${PORT}${HOSTED ? " (hosted)" : ""}`);
+  console.log(`Call Coach running at http://localhost:${server.address().port}${HOSTED ? " (hosted)" : ""}`);
   const access = accessSummary();
   if (access) (access.startsWith("Warning") ? console.warn : console.log)(access);
   console.log(`Speech: ${TRANSCRIBE === "server" ? `${ASR_MODEL} on this server` : TRANSCRIBE === "browser" ? "in each visitor's browser" : "off"}`);

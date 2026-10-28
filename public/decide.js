@@ -16,6 +16,9 @@ export const DEFAULT_CONFIG = {
   confirmUpdates: 2,      // ...or stay on top for this many updates in a row
   minRemaining: 0.3,      // if skipped options held over 70% of the probability, the rest is too thin to trust
   doneCooldownMs: 3 * 60 * 1000,
+  minActionConfidence: 0, // playbooks can require a clear model judgment
+  minMargin: 0,          // minimum original lead over the runner-up
+  actionMinScore: {},    // stricter thresholds for particular actions
   signalMin: 0.6,         // default threshold for a signal-based tip
 
   // Buying stage
@@ -43,7 +46,7 @@ export function createStageMemory() {
  * Returns { level, label, position, buyingScore, spread, confidence, confidenceLabel, trend, from, changed }
  */
 export function trackStage(answer, mem, labels, config = DEFAULT_CONFIG) {
-  if (!answer || typeof answer.score !== "number" || !labels?.length) return null;
+  if (!answer || !Number.isFinite(answer.score) || !labels || labels.length < 2) return null;
   const max = labels.length - 1;
   const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 
@@ -98,7 +101,7 @@ export function markDone(memory, action, now = Date.now(), config = DEFAULT_CONF
 }
 
 /** Pick up to `max` tips: signal-specific ones first, then general ones. */
-export function pickTips(action, signals, max = 3, config = DEFAULT_CONFIG) {
+export function pickTips(action, signals, max = 3, config = DEFAULT_CONFIG, answers = {}) {
   if (!action?.tips) return [];
   const specific = (action.tips.when || [])
     .filter((t) => {
@@ -108,7 +111,13 @@ export function pickTips(action, signals, max = 3, config = DEFAULT_CONFIG) {
       return v >= (t.min ?? config.signalMin);
     })
     .map((t) => t.text);
-  return [...specific, ...(action.tips.always || [])].slice(0, max);
+  const choices = (action.tips.choices || [])
+    .filter((tip) => {
+      const a = answers[tip.question];
+      return a?.type === "choice" && a.choice === tip.option &&
+        a.probabilities?.[tip.option] >= (tip.min ?? 0.65) && a.confidence >= (tip.confidence ?? 0.4);
+    }).map((tip) => tip.text);
+  return [...choices, ...specific, ...(action.tips.always || [])].slice(0, max);
 }
 
 /**
@@ -145,13 +154,22 @@ export function decide(answers, playbook, memory, now = Date.now(), config = DEF
   const note = blockNotes[rawTop] || null;
 
   // 2. Rescale what's left
-  const kept = Object.entries(nba.probabilities).filter(([k]) => !skipped.has(k));
+  const kept = Object.entries(nba.probabilities).filter(([k, p]) => !skipped.has(k) && Object.hasOwn(playbook.actions, k) && Number.isFinite(p) && p >= 0 && p <= 1);
   const remaining = kept.reduce((sum, [, p]) => sum + p, 0);
   if (!kept.length || remaining < config.minRemaining) {
     memory.current = null;
     return listen(playbook, null, 0, note);
   }
   const probs = Object.fromEntries(kept.map(([k, p]) => [k, p / remaining]));
+
+  // Original evidence must be clear before playbook exclusions or priorities apply.
+  const ranked = Object.values(nba.probabilities).sort((a, b) => b - a);
+  if ((nba.confidence ?? 0) < (config.minActionConfidence ?? 0) || ranked[0] - (ranked[1] ?? 0) < (config.minMargin ?? 0)) {
+    memory.current = null;
+    memory.challenger = null;
+    memory.streak = 0;
+    return listen(playbook, null, ranked[0] || 0, note || "The next step is uncertain. Ask one clarifying question.");
+  }
 
   // 3. Leader, with near-ties broken by playbook priority
   const rank = (k) => {
@@ -166,7 +184,7 @@ export function decide(answers, playbook, memory, now = Date.now(), config = DEF
   // 4. Stability: hold the current suggestion unless it's clearly beaten
   let chosen = top;
   const cur = memory.current;
-  const curStillValid = cur && cur !== top && probs[cur] != null && probs[cur] >= config.minScore;
+  const curStillValid = cur && cur !== top && probs[cur] != null && nba.probabilities[cur] >= (config.actionMinScore?.[cur] ?? config.minScore);
   if (curStillValid) {
     memory.streak = memory.challenger === top ? memory.streak + 1 : 1;
     memory.challenger = top;
@@ -176,8 +194,9 @@ export function decide(answers, playbook, memory, now = Date.now(), config = DEF
   if (chosen === top) { memory.challenger = null; memory.streak = 0; }
 
   // 5. Minimum score
-  const score = probs[chosen];
-  if (chosen === "no_action" || score < config.minScore) {
+  // Excluding an option must never inflate the probability shown to the rep.
+  const score = nba.probabilities[chosen];
+  if (chosen === "no_action" || score < (config.actionMinScore?.[chosen] ?? config.minScore)) {
     memory.current = null;
     return listen(playbook, chosen === "no_action" ? null : chosen, score, note);
   }
@@ -190,7 +209,7 @@ export function decide(answers, playbook, memory, now = Date.now(), config = DEF
     action: chosen,
     title: action?.title || chosen,
     score,
-    tips: pickTips(action, signals, 3, config),
+    tips: pickTips(action, signals, 3, config, answers),
     changed,
     note
   };

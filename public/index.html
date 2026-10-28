@@ -470,6 +470,13 @@ main.pip .picker-note { font-size: 0.8rem; margin-top: 4px; }
   <div class="notice panel" id="setup" hidden>The server has no API key yet. Stop it and restart with <code>TYPESAFE_API_KEY=your_key node server.mjs</code>.</div>
   <div class="notice panel" id="autoNotice" hidden><span><strong>Auto capture is recording both sides of this call.</strong> Everyone on the call should know and agree. Audio is transcribed on this computer; the text goes to TypeSafe. Headphones work best: without them, the mic hears the other person too, and those lines are filtered out as echo.</span></div>
 
+  <div class="notice panel" id="livePanel" hidden>
+    <label for="liveSession">Live call transcript</label>
+    <select class="field-input" id="liveSession"><option value="">Disconnected</option></select>
+    <button type="button" class="btn small" id="refreshLive">Refresh calls</button>
+    <span id="liveStatus" role="status">No call connected.</span>
+  </div>
+
   <section class="picker" id="picker" hidden aria-labelledby="pickerTitle">
     <h1 class="picker-title" id="pickerTitle">What are you doing today?</h1>
     <p class="picker-sub">Pick a coach. You can switch any time from the top bar.</p>
@@ -536,7 +543,7 @@ main.pip .picker-note { font-size: 0.8rem; margin-top: 4px; }
       <h2 class="next-title" id="nextTitle">Start the conversation</h2>
       <p class="next-note" id="nextNote" hidden></p>
     </div>
-    <div class="next-conf" id="nextConf" hidden><b class="num" id="nextPct">&ndash;</b>confidence<div class="bar-mini"><i id="nextBar"></i></div></div>
+    <div class="next-conf" id="nextConf" hidden><b class="num" id="nextPct">&ndash;</b>model probability<div class="bar-mini"><i id="nextBar"></i></div></div>
     <div class="next-body">
       <p class="tip-main" id="tipMain"></p>
       <details class="more" id="more" hidden><summary id="moreLabel">More tips</summary><ul id="moreList"></ul></details>
@@ -563,6 +570,7 @@ main.pip .picker-note { font-size: 0.8rem; margin-top: 4px; }
 <script type="module">
 import { decide, trackStage, createMemory, markDone, DEFAULT_CONFIG } from "/decide.js";
 import { createLatestRequest } from "/latest-request.js";
+import { createLiveCallFollower } from "/live-call.js";
 import { startSession, getCallAudio, getMicAudio } from "/capture.js";
 import { listCoaches, getCoach, buildCoach, onCoachesChanged } from "/coaches.js";
 import { apiHeaders, getKey, getAccessCode, setKey } from "/access.js";
@@ -1060,6 +1068,76 @@ const coachingRequest = createLatestRequest({
   headers: apiHeaders,
   onBusy: (busy) => { app.inFlight = busy; setActivity(); },
 });
+let followingLiveSession = false;
+let selectedLiveSession = "";
+function setLiveConnected(connected) {
+  followingLiveSession = connected;
+  for (const key of ["mic", "auto", "capture", "sample", "typeIn", "overlayAuto", "overlayRec"]) {
+    const el = document.getElementById(key);
+    if (el) el.disabled = connected;
+  }
+  if (!connected) renderCapture();
+}
+const liveFollower = createLiveCallFollower({
+  onUpdate(session) {
+    const turns = session.segments.map(s => ({ speaker: s.speaker === "staff" ? "rep" : "customer", text: s.text, at: s.at * 1000 }));
+    const changed = JSON.stringify(turns) !== JSON.stringify(app.turns);
+    if (changed) {
+      coachingRequest.invalidate();
+      app.turns = turns;
+      const last = turns.at(-1);
+      if (last) showHeard(last.text, last.speaker);
+      scheduleEvaluate();
+    }
+    $("liveStatus").textContent = (session.ended ? "Call ended." : "Following live call.") +
+      (session.incomplete || session.truncated ? " Transcript coverage is partial." : "") +
+      " " + turns.length + " final segments received.";
+  },
+  onError(message) {
+    selectedLiveSession = "";
+    setLiveConnected(false);
+    coachingRequest.invalidate();
+    $("liveSession").value = "";
+    $("liveStatus").textContent = "Disconnected: " + message;
+  },
+});
+async function refreshLiveCalls() {
+  try {
+    const response = await fetch("/api/live/sessions");
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Cannot list live calls.");
+    const selected = $("liveSession").value;
+    const options = [Object.assign(document.createElement("option"), { value: "", textContent: "Disconnected" })];
+    for (const session of data.sessions) {
+      options.push(Object.assign(document.createElement("option"), {
+        value: session.session_id,
+        textContent: (session.ended ? "Ended: " : "Live: ") + session.call_id + " · " + new Date(session.started_at * 1000).toLocaleTimeString(),
+      }));
+    }
+    $("liveSession").replaceChildren(...options);
+    $("liveSession").value = selected;
+    if (!data.sessions.length) $("liveStatus").textContent = "No transcript sessions available. Refresh when a call starts.";
+  } catch (err) { $("liveStatus").textContent = err.message; }
+}
+$("refreshLive").addEventListener("click", refreshLiveCalls);
+$("liveSession").addEventListener("change", async () => {
+  const sessionId = $("liveSession").value;
+  if (sessionId && app.turns.length && !confirm("Connect this call? This clears the current conversation.")) {
+    $("liveSession").value = selectedLiveSession;
+    return;
+  }
+  if (app.listening) stopListening();
+  await stopCapture();
+  resetCall();
+  if (sessionId) {
+    $("liveSession").value = sessionId;
+    selectedLiveSession = sessionId;
+    setLiveConnected(true);
+    $("liveStatus").textContent = "Connecting to selected call…";
+    liveFollower.start(sessionId);
+  }
+});
+
 function scheduleEvaluate() {
   coachingRequest.invalidate();
   clearTimeout(app.timer);
@@ -1112,6 +1190,7 @@ async function evaluate() {
 function addTurn(text, { speaker = app.speaker, merge = false, evaluate = true } = {}) {
   text = text.trim();
   if (!text) return;
+  if (followingLiveSession) { showError("Disconnect the live call before adding manual speech."); return; }
   coachingRequest.invalidate();
   const prev = app.turns[app.turns.length - 1];
   if (merge && prev && prev.merge && prev.speaker === speaker && Date.now() - prev.at < 15000) { prev.text += " " + text; prev.at = Date.now(); }
@@ -1306,6 +1385,11 @@ $("modeBtn").addEventListener("click", changeMode);
 $("overlayMode").addEventListener("click", changeMode);
 
 function resetCall() {
+  liveFollower.stop();
+  selectedLiveSession = "";
+  setLiveConnected(false);
+  $("liveSession").value = "";
+  $("liveStatus").textContent = "No call connected.";
   app.sampleId++;
   coachingRequest.invalidate();
   clearTimeout(app.timer);
@@ -1698,6 +1782,8 @@ if (isOverlay) {
 if (!isOverlay && !REHEARSAL && "documentPictureInPicture" in window) $("pipBtn").hidden = false;
 
 fetch("/api/health").then((r) => r.json()).then((h) => {
+  $("livePanel").hidden = !h.liveIngest || REHEARSAL || isOverlay;
+  if (h.liveIngest && !REHEARSAL && !isOverlay) refreshLiveCalls();
   if (h.hosted) {
     // On a website, visitors bring their own key (or the site's access code)
     const covered = getKey() || h.access === "open" || (h.access === "code-or-key" && getAccessCode());

@@ -1,0 +1,16 @@
+{
+  "name": "Automotive sales",
+  "description": "Live vehicle-sales coaching: discover needs, address concerns, and agree on a concrete next step.",
+  "kind": "live",
+  "order": 0,
+  "icon": "trend",
+  "transcript": {
+    "key": "vehicle_sales_call",
+    "rep": "sales_rep",
+    "other": "customer"
+  },
+  "questions": {
+    "action": "next_best_action",
+    "stage": "buying_stage"
+  }
+}

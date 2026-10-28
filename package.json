@@ -10,7 +10,8 @@
     "check-modes": "node tools/check-modes.mjs",
     "icon": "electron tools/make-icon.js",
     "dist": "electron-builder --win nsis portable",
-    "test": "node --test"
+    "test": "node --test",
+    "eval:live": "node --env-file-if-exists=.env tools/eval-sales.mjs --live"
   },
   "engines": {
     "node": ">=22.9.0"

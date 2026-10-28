@@ -1,0 +1,647 @@
+{
+  "generated_at": "2026-10-28T16:42:39.583Z",
+  "scope": "Authored synthetic regression cases. Not independent human evaluation or real-call accuracy.",
+  "total": 16,
+  "passed": 16,
+  "action_matches": 16,
+  "objection_matches": 16,
+  "abstentions": 2,
+  "latency_ms": {
+    "p50": 97,
+    "p95": 359
+  },
+  "usage": {
+    "input_tokens": 29781,
+    "output_tokens": 6056
+  },
+  "results": [
+    {
+      "id": "sales-pricing",
+      "mode": "sales",
+      "passed": true,
+      "action_match": true,
+      "objection_match": true,
+      "expected_actions": [
+        "send_pricing"
+      ],
+      "action": "send_pricing",
+      "raw_action": "send_pricing",
+      "abstained": false,
+      "objection": "none",
+      "expected_objection": "none",
+      "model": "jev-1.14.0",
+      "trace": {
+        "contract_hash": "1f6e7446e7e2be226dc665bfaebf304af467d1dbcc2d29a799cf15ce83887d47",
+        "state_hash": "c5b9309fa162f11cf9bcd163b5287c43f4c67c9dca347620fa4c77d67d96a7e1"
+      },
+      "policy_hash": "95cd9b08e22dbc4969ed53a835b955e62a128d289049f4d0b36c7013c1d79e2c",
+      "latency_ms": 359,
+      "attempts": 1,
+      "usage": {
+        "input_tokens": 1809,
+        "output_tokens": 383
+      },
+      "action_probabilities": {
+        "send_pricing": 0.94,
+        "book_demo": 0,
+        "loop_in_decision_maker": 0,
+        "handle_objection": 0,
+        "send_proposal": 0.05,
+        "ask_discovery_question": 0.01,
+        "nurture_follow_up": 0,
+        "no_action": 0
+      },
+      "action_confidence": 0.93
+    },
+    {
+      "id": "sales-price-blocker",
+      "mode": "sales",
+      "passed": true,
+      "action_match": true,
+      "objection_match": true,
+      "expected_actions": [
+        "handle_objection"
+      ],
+      "action": "handle_objection",
+      "raw_action": "handle_objection",
+      "abstained": false,
+      "objection": "price",
+      "expected_objection": "price",
+      "model": "jev-1.14.0",
+      "trace": {
+        "contract_hash": "1f6e7446e7e2be226dc665bfaebf304af467d1dbcc2d29a799cf15ce83887d47",
+        "state_hash": "1b802e8fa62b88dc2cd53ea69826504bff8e495225051a055ed53de09fd6ae9d"
+      },
+      "policy_hash": "95cd9b08e22dbc4969ed53a835b955e62a128d289049f4d0b36c7013c1d79e2c",
+      "latency_ms": 100,
+      "attempts": 1,
+      "usage": {
+        "input_tokens": 1809,
+        "output_tokens": 384
+      },
+      "action_probabilities": {
+        "send_pricing": 0,
+        "book_demo": 0,
+        "loop_in_decision_maker": 0,
+        "handle_objection": 0.99,
+        "send_proposal": 0,
+        "ask_discovery_question": 0,
+        "nurture_follow_up": 0,
+        "no_action": 0.01
+      },
+      "action_confidence": 0.99
+    },
+    {
+      "id": "sales-approver",
+      "mode": "sales",
+      "passed": true,
+      "action_match": true,
+      "objection_match": true,
+      "expected_actions": [
+        "loop_in_decision_maker"
+      ],
+      "action": "loop_in_decision_maker",
+      "raw_action": "loop_in_decision_maker",
+      "abstained": false,
+      "objection": "authority",
+      "expected_objection": "authority",
+      "model": "jev-1.14.0",
+      "trace": {
+        "contract_hash": "1f6e7446e7e2be226dc665bfaebf304af467d1dbcc2d29a799cf15ce83887d47",
+        "state_hash": "20f118a302878fc801aa71c54da8e1596ecc5d655d29d94fd163c695a557f2ae"
+      },
+      "policy_hash": "95cd9b08e22dbc4969ed53a835b955e62a128d289049f4d0b36c7013c1d79e2c",
+      "latency_ms": 115,
+      "attempts": 1,
+      "usage": {
+        "input_tokens": 1813,
+        "output_tokens": 387
+      },
+      "action_probabilities": {
+        "send_pricing": 0,
+        "book_demo": 0,
+        "loop_in_decision_maker": 1,
+        "handle_objection": 0,
+        "send_proposal": 0,
+        "ask_discovery_question": 0,
+        "nurture_follow_up": 0,
+        "no_action": 0
+      },
+      "action_confidence": 1
+    },
+    {
+      "id": "sales-ready",
+      "mode": "sales",
+      "passed": true,
+      "action_match": true,
+      "objection_match": true,
+      "expected_actions": [
+        "send_proposal"
+      ],
+      "action": "send_proposal",
+      "raw_action": "send_proposal",
+      "abstained": false,
+      "objection": "none",
+      "expected_objection": "none",
+      "model": "jev-1.14.0",
+      "trace": {
+        "contract_hash": "1f6e7446e7e2be226dc665bfaebf304af467d1dbcc2d29a799cf15ce83887d47",
+        "state_hash": "c066a99192462952068974cda97680fc2e1731780bae7957ff12f1a27173cbf0"
+      },
+      "policy_hash": "95cd9b08e22dbc4969ed53a835b955e62a128d289049f4d0b36c7013c1d79e2c",
+      "latency_ms": 118,
+      "attempts": 1,
+      "usage": {
+        "input_tokens": 1818,
+        "output_tokens": 383
+      },
+      "action_probabilities": {
+        "send_pricing": 0,
+        "book_demo": 0,
+        "loop_in_decision_maker": 0,
+        "handle_objection": 0,
+        "send_proposal": 1,
+        "ask_discovery_question": 0,
+        "nurture_follow_up": 0,
+        "no_action": 0
+      },
+      "action_confidence": 1
+    },
+    {
+      "id": "sales-follow-up",
+      "mode": "sales",
+      "passed": true,
+      "action_match": true,
+      "objection_match": true,
+      "expected_actions": [
+        "nurture_follow_up"
+      ],
+      "action": "nurture_follow_up",
+      "raw_action": "nurture_follow_up",
+      "abstained": false,
+      "objection": "timing",
+      "expected_objection": "timing",
+      "model": "jev-1.14.0",
+      "trace": {
+        "contract_hash": "1f6e7446e7e2be226dc665bfaebf304af467d1dbcc2d29a799cf15ce83887d47",
+        "state_hash": "7096030a4a6b57840d55617ef2ce851f6379d15581bc2e0f47540ca5cd20d632"
+      },
+      "policy_hash": "95cd9b08e22dbc4969ed53a835b955e62a128d289049f4d0b36c7013c1d79e2c",
+      "latency_ms": 98,
+      "attempts": 1,
+      "usage": {
+        "input_tokens": 1811,
+        "output_tokens": 386
+      },
+      "action_probabilities": {
+        "send_pricing": 0,
+        "book_demo": 0,
+        "loop_in_decision_maker": 0,
+        "handle_objection": 0.01,
+        "send_proposal": 0,
+        "ask_discovery_question": 0,
+        "nurture_follow_up": 0.99,
+        "no_action": 0
+      },
+      "action_confidence": 0.99
+    },
+    {
+      "id": "sales-wrong-number",
+      "mode": "sales",
+      "passed": true,
+      "action_match": true,
+      "objection_match": true,
+      "expected_actions": [
+        "no_action"
+      ],
+      "action": "no_action",
+      "raw_action": "no_action",
+      "abstained": true,
+      "objection": "none",
+      "expected_objection": "none",
+      "model": "jev-1.14.0",
+      "trace": {
+        "contract_hash": "1f6e7446e7e2be226dc665bfaebf304af467d1dbcc2d29a799cf15ce83887d47",
+        "state_hash": "f22184ff1a33be91cb4847477ba4272ada6c01f4e573d85732649317034ee045"
+      },
+      "policy_hash": "95cd9b08e22dbc4969ed53a835b955e62a128d289049f4d0b36c7013c1d79e2c",
+      "latency_ms": 129,
+      "attempts": 1,
+      "usage": {
+        "input_tokens": 1808,
+        "output_tokens": 382
+      },
+      "action_probabilities": {
+        "send_pricing": 0,
+        "book_demo": 0,
+        "loop_in_decision_maker": 0,
+        "handle_objection": 0,
+        "send_proposal": 0,
+        "ask_discovery_question": 0,
+        "nurture_follow_up": 0,
+        "no_action": 1
+      },
+      "action_confidence": 1
+    },
+    {
+      "id": "auto-needs",
+      "mode": "automotive",
+      "passed": true,
+      "action_match": true,
+      "objection_match": true,
+      "expected_actions": [
+        "ask_discovery_question"
+      ],
+      "action": "ask_discovery_question",
+      "raw_action": "ask_discovery_question",
+      "abstained": false,
+      "objection": "none",
+      "expected_objection": "none",
+      "model": "jev-1.14.0",
+      "trace": {
+        "contract_hash": "314e96dbbbe597ce313cbb4eccfee4c0d23311e72ee9299faff0f8f1f405e804",
+        "state_hash": "b8b66acb43a831ab2278a40c561b29203204f3689ffdc463335f920fff43b1a8"
+      },
+      "policy_hash": "51ddc5f08af1341809701374b3814c10e9e68a55bb82d190de46b68155a58b74",
+      "latency_ms": 85,
+      "attempts": 1,
+      "usage": {
+        "input_tokens": 1892,
+        "output_tokens": 377
+      },
+      "action_probabilities": {
+        "ask_discovery_question": 1,
+        "verify_vehicle": 0,
+        "explain_price": 0,
+        "discuss_trade": 0,
+        "explain_finance": 0,
+        "handle_objection": 0,
+        "include_buyer": 0,
+        "book_visit": 0,
+        "agree_follow_up": 0,
+        "no_action": 0
+      },
+      "action_confidence": 1
+    },
+    {
+      "id": "auto-availability",
+      "mode": "automotive",
+      "passed": true,
+      "action_match": true,
+      "objection_match": true,
+      "expected_actions": [
+        "verify_vehicle"
+      ],
+      "action": "verify_vehicle",
+      "raw_action": "verify_vehicle",
+      "abstained": false,
+      "objection": "none",
+      "expected_objection": "none",
+      "model": "jev-1.14.0",
+      "trace": {
+        "contract_hash": "314e96dbbbe597ce313cbb4eccfee4c0d23311e72ee9299faff0f8f1f405e804",
+        "state_hash": "647d10df2ae301b042542c741fe1829dd2ff4d3019340765adf283b0ec334c27"
+      },
+      "policy_hash": "51ddc5f08af1341809701374b3814c10e9e68a55bb82d190de46b68155a58b74",
+      "latency_ms": 82,
+      "attempts": 1,
+      "usage": {
+        "input_tokens": 1882,
+        "output_tokens": 374
+      },
+      "action_probabilities": {
+        "ask_discovery_question": 0,
+        "verify_vehicle": 1,
+        "explain_price": 0,
+        "discuss_trade": 0,
+        "explain_finance": 0,
+        "handle_objection": 0,
+        "include_buyer": 0,
+        "book_visit": 0,
+        "agree_follow_up": 0,
+        "no_action": 0
+      },
+      "action_confidence": 1
+    },
+    {
+      "id": "auto-total-price",
+      "mode": "automotive",
+      "passed": true,
+      "action_match": true,
+      "objection_match": true,
+      "expected_actions": [
+        "explain_price"
+      ],
+      "action": "explain_price",
+      "raw_action": "explain_price",
+      "abstained": false,
+      "objection": "none",
+      "expected_objection": "none",
+      "model": "jev-1.14.0",
+      "trace": {
+        "contract_hash": "314e96dbbbe597ce313cbb4eccfee4c0d23311e72ee9299faff0f8f1f405e804",
+        "state_hash": "3882e428332700c93a9d8ac193547196c442b82a0f1e52dcedff1dd74bd6dc4f"
+      },
+      "policy_hash": "51ddc5f08af1341809701374b3814c10e9e68a55bb82d190de46b68155a58b74",
+      "latency_ms": 177,
+      "attempts": 1,
+      "usage": {
+        "input_tokens": 1881,
+        "output_tokens": 375
+      },
+      "action_probabilities": {
+        "ask_discovery_question": 0,
+        "verify_vehicle": 0,
+        "explain_price": 1,
+        "discuss_trade": 0,
+        "explain_finance": 0,
+        "handle_objection": 0,
+        "include_buyer": 0,
+        "book_visit": 0,
+        "agree_follow_up": 0,
+        "no_action": 0
+      },
+      "action_confidence": 1
+    },
+    {
+      "id": "auto-financing",
+      "mode": "automotive",
+      "passed": true,
+      "action_match": true,
+      "objection_match": true,
+      "expected_actions": [
+        "explain_finance"
+      ],
+      "action": "explain_finance",
+      "raw_action": "explain_finance",
+      "abstained": false,
+      "objection": "none",
+      "expected_objection": "none",
+      "model": "jev-1.14.0",
+      "trace": {
+        "contract_hash": "314e96dbbbe597ce313cbb4eccfee4c0d23311e72ee9299faff0f8f1f405e804",
+        "state_hash": "eb7bca8b3978d5ddec693391aae3a327ba145d1ded3eaf00e3188891c8fab454"
+      },
+      "policy_hash": "51ddc5f08af1341809701374b3814c10e9e68a55bb82d190de46b68155a58b74",
+      "latency_ms": 95,
+      "attempts": 1,
+      "usage": {
+        "input_tokens": 1882,
+        "output_tokens": 377
+      },
+      "action_probabilities": {
+        "ask_discovery_question": 0,
+        "verify_vehicle": 0,
+        "explain_price": 0,
+        "discuss_trade": 0,
+        "explain_finance": 1,
+        "handle_objection": 0,
+        "include_buyer": 0,
+        "book_visit": 0,
+        "agree_follow_up": 0,
+        "no_action": 0
+      },
+      "action_confidence": 1
+    },
+    {
+      "id": "auto-trade",
+      "mode": "automotive",
+      "passed": true,
+      "action_match": true,
+      "objection_match": true,
+      "expected_actions": [
+        "discuss_trade"
+      ],
+      "action": "discuss_trade",
+      "raw_action": "discuss_trade",
+      "abstained": false,
+      "objection": "none",
+      "expected_objection": "none",
+      "model": "jev-1.14.0",
+      "trace": {
+        "contract_hash": "314e96dbbbe597ce313cbb4eccfee4c0d23311e72ee9299faff0f8f1f405e804",
+        "state_hash": "663cd068ae6d21f4dd0e2c256eb230e467c8e36b76d5f23468d264f32f08d578"
+      },
+      "policy_hash": "51ddc5f08af1341809701374b3814c10e9e68a55bb82d190de46b68155a58b74",
+      "latency_ms": 89,
+      "attempts": 1,
+      "usage": {
+        "input_tokens": 1889,
+        "output_tokens": 375
+      },
+      "action_probabilities": {
+        "ask_discovery_question": 0,
+        "verify_vehicle": 0,
+        "explain_price": 0.01,
+        "discuss_trade": 0.99,
+        "explain_finance": 0,
+        "handle_objection": 0,
+        "include_buyer": 0,
+        "book_visit": 0,
+        "agree_follow_up": 0,
+        "no_action": 0
+      },
+      "action_confidence": 0.99
+    },
+    {
+      "id": "auto-history",
+      "mode": "automotive",
+      "passed": true,
+      "action_match": true,
+      "objection_match": true,
+      "expected_actions": [
+        "handle_objection"
+      ],
+      "action": "handle_objection",
+      "raw_action": "handle_objection",
+      "abstained": false,
+      "objection": "trust",
+      "expected_objection": "trust",
+      "model": "jev-1.14.0",
+      "trace": {
+        "contract_hash": "314e96dbbbe597ce313cbb4eccfee4c0d23311e72ee9299faff0f8f1f405e804",
+        "state_hash": "84164e45ac2133bc8e340b6f84dadad068b6ced3380b68be22fcb4dcd5541615"
+      },
+      "policy_hash": "51ddc5f08af1341809701374b3814c10e9e68a55bb82d190de46b68155a58b74",
+      "latency_ms": 88,
+      "attempts": 1,
+      "usage": {
+        "input_tokens": 1885,
+        "output_tokens": 376
+      },
+      "action_probabilities": {
+        "ask_discovery_question": 0,
+        "verify_vehicle": 0,
+        "explain_price": 0,
+        "discuss_trade": 0,
+        "explain_finance": 0,
+        "handle_objection": 1,
+        "include_buyer": 0,
+        "book_visit": 0,
+        "agree_follow_up": 0,
+        "no_action": 0
+      },
+      "action_confidence": 1
+    },
+    {
+      "id": "auto-visit",
+      "mode": "automotive",
+      "passed": true,
+      "action_match": true,
+      "objection_match": true,
+      "expected_actions": [
+        "book_visit"
+      ],
+      "action": "book_visit",
+      "raw_action": "book_visit",
+      "abstained": false,
+      "objection": "none",
+      "expected_objection": "none",
+      "model": "jev-1.14.0",
+      "trace": {
+        "contract_hash": "314e96dbbbe597ce313cbb4eccfee4c0d23311e72ee9299faff0f8f1f405e804",
+        "state_hash": "8f0f6af04098ea464fb49171f60ed0af02ef08923e02b9b9100f529a6530323f"
+      },
+      "policy_hash": "51ddc5f08af1341809701374b3814c10e9e68a55bb82d190de46b68155a58b74",
+      "latency_ms": 85,
+      "attempts": 1,
+      "usage": {
+        "input_tokens": 1883,
+        "output_tokens": 374
+      },
+      "action_probabilities": {
+        "ask_discovery_question": 0.01,
+        "verify_vehicle": 0.31,
+        "explain_price": 0,
+        "discuss_trade": 0,
+        "explain_finance": 0,
+        "handle_objection": 0,
+        "include_buyer": 0,
+        "book_visit": 0.68,
+        "agree_follow_up": 0,
+        "no_action": 0
+      },
+      "action_confidence": 0.64
+    },
+    {
+      "id": "auto-other-buyer",
+      "mode": "automotive",
+      "passed": true,
+      "action_match": true,
+      "objection_match": true,
+      "expected_actions": [
+        "include_buyer"
+      ],
+      "action": "include_buyer",
+      "raw_action": "include_buyer",
+      "abstained": false,
+      "objection": "authority",
+      "expected_objection": "authority",
+      "model": "jev-1.14.0",
+      "trace": {
+        "contract_hash": "314e96dbbbe597ce313cbb4eccfee4c0d23311e72ee9299faff0f8f1f405e804",
+        "state_hash": "5e531dd8fdee280c9273349def39cbcffba4908825f321623bd21fe415502884"
+      },
+      "policy_hash": "51ddc5f08af1341809701374b3814c10e9e68a55bb82d190de46b68155a58b74",
+      "latency_ms": 89,
+      "attempts": 1,
+      "usage": {
+        "input_tokens": 1889,
+        "output_tokens": 375
+      },
+      "action_probabilities": {
+        "ask_discovery_question": 0,
+        "verify_vehicle": 0,
+        "explain_price": 0,
+        "discuss_trade": 0,
+        "explain_finance": 0,
+        "handle_objection": 0,
+        "include_buyer": 1,
+        "book_visit": 0,
+        "agree_follow_up": 0,
+        "no_action": 0
+      },
+      "action_confidence": 1
+    },
+    {
+      "id": "auto-wrong-number",
+      "mode": "automotive",
+      "passed": true,
+      "action_match": true,
+      "objection_match": true,
+      "expected_actions": [
+        "no_action"
+      ],
+      "action": "no_action",
+      "raw_action": "no_action",
+      "abstained": true,
+      "objection": "none",
+      "expected_objection": "none",
+      "model": "jev-1.14.0",
+      "trace": {
+        "contract_hash": "314e96dbbbe597ce313cbb4eccfee4c0d23311e72ee9299faff0f8f1f405e804",
+        "state_hash": "5e26c3cf6d98b7d4380c1022d5ff8d07ad57a364e0985c9b833a414b5164d420"
+      },
+      "policy_hash": "51ddc5f08af1341809701374b3814c10e9e68a55bb82d190de46b68155a58b74",
+      "latency_ms": 101,
+      "attempts": 1,
+      "usage": {
+        "input_tokens": 1881,
+        "output_tokens": 374
+      },
+      "action_probabilities": {
+        "ask_discovery_question": 0,
+        "verify_vehicle": 0,
+        "explain_price": 0,
+        "discuss_trade": 0,
+        "explain_finance": 0,
+        "handle_objection": 0.01,
+        "include_buyer": 0,
+        "book_visit": 0,
+        "agree_follow_up": 0,
+        "no_action": 0.99
+      },
+      "action_confidence": 0.99
+    },
+    {
+      "id": "auto-resolved-objection",
+      "mode": "automotive",
+      "passed": true,
+      "action_match": true,
+      "objection_match": true,
+      "expected_actions": [
+        "book_visit"
+      ],
+      "action": "book_visit",
+      "raw_action": "book_visit",
+      "abstained": false,
+      "objection": "none",
+      "expected_objection": "none",
+      "model": "jev-1.14.0",
+      "trace": {
+        "contract_hash": "314e96dbbbe597ce313cbb4eccfee4c0d23311e72ee9299faff0f8f1f405e804",
+        "state_hash": "659980d7b805edafe4db98b68c7565d1937fc958b3678ccc2a00cf24e4980abd"
+      },
+      "policy_hash": "51ddc5f08af1341809701374b3814c10e9e68a55bb82d190de46b68155a58b74",
+      "latency_ms": 97,
+      "attempts": 1,
+      "usage": {
+        "input_tokens": 1949,
+        "output_tokens": 374
+      },
+      "action_probabilities": {
+        "ask_discovery_question": 0,
+        "verify_vehicle": 0.02,
+        "explain_price": 0,
+        "discuss_trade": 0,
+        "explain_finance": 0,
+        "handle_objection": 0,
+        "include_buyer": 0,
+        "book_visit": 0.98,
+        "agree_follow_up": 0,
+        "no_action": 0
+      },
+      "action_confidence": 0.98
+    }
+  ]
+}

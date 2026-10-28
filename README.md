@@ -1,6 +1,6 @@
 # Call Coach 
 
-A live call coach. It listens to the conversation, sends it to TypeSafe Jev after every sentence, and shows you what to do next with a confidence score. It comes with nine coaches: five for live calls (sales, customer service, job interviews, social cues, and anxiety) and four for practicing on your own, dating included. You can also build your own in Settings.
+A live call coach. It listens to the conversation, sends it to TypeSafe Jev after every sentence, and shows you what to do next with a confidence score. It comes with ten coaches: six for live calls (automotive sales, general sales, customer service, job interviews, social cues, and anxiety) and four for practicing on your own, dating included. You can also build your own in Settings.
 
 This is a work in progress and a demo of Jev capabilities. Feel free to fork it and modify it. Or just message me if you want to make any changes. I am also open to pull requests as well for making improvements. Shoot me a DM if you need anything
 
@@ -46,7 +46,7 @@ Because the exe isn't code-signed yet, Windows SmartScreen may say it's from an 
 
 ### Build the installer
 
-On Windows, with Node.js 18 or newer:
+On Windows, with Node.js 22.9 or newer:
 
 ```sh
 npm install
@@ -57,7 +57,7 @@ The installer and portable exe land in `dist/`. `npm run icon` redraws the app i
 
 ## Run from source
 
-Node.js 18 or newer. Run `npm install` once; it adds the local speech model and the desktop overlay. `Call Coach.bat` (or `npm run overlay`) starts the overlay. To use it in a browser instead:
+Node.js 22.9 or newer. Run `npm install` once; it adds the local speech model and the desktop overlay. `Call Coach.bat` (or `npm run overlay`) starts the overlay. To use it in a browser instead:
 
 macOS or Linux:
 
@@ -190,7 +190,7 @@ docker build -t call-coach .
 docker run -p 8080:8080 call-coach
 ```
 
-Without Docker, on any host with Node.js 18 or newer:
+Without Docker, on any host with Node.js 22.9 or newer:
 
 ```sh
 npm ci --omit=dev --omit=optional

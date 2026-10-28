@@ -35,6 +35,9 @@ for (const id of (await readdir(MODES_DIR)).sort()) {
     }
     for (const a of Object.keys(p.actions || {})) if (!options.includes(a)) problems.push(`action "${a}" is not an option in schema.json`);
     for (const [a, def] of Object.entries(p.actions || {})) {
+      for (const t of def.tips?.choices || []) {
+        if (schema[t.question]?.type !== "choice" || !Object.hasOwn(schema[t.question].criteria, t.option)) problems.push(`choice tip in "${a}" references an unknown option`);
+      }
       for (const t of def.tips?.when || []) if (!isSignal(t.signal)) problems.push(`tip in "${a}" uses "${t.signal}", which is not a yes/no question`);
     }
     for (const k of Object.keys(p.signals || {})) if (!isSignal(k)) problems.push(`signal "${k}" is not a yes/no question`);
