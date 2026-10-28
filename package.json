@@ -5,14 +5,15 @@
   "main": "electron.js",
   "description": "Live call coaching and conversation practice, powered by TypeSafe Jev",
   "scripts": {
-    "start": "node server.mjs",
+    "start": "node --env-file-if-exists=.env server.mjs",
     "overlay": "electron .",
     "check-modes": "node tools/check-modes.mjs",
     "icon": "electron tools/make-icon.js",
-    "dist": "electron-builder --win nsis portable"
+    "dist": "electron-builder --win nsis portable",
+    "test": "node --test"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=22.9.0"
   },
   "devDependencies": {
     "electron": "^33.4.11",

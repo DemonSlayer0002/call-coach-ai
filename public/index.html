@@ -562,6 +562,7 @@ main.pip .picker-note { font-size: 0.8rem; margin-top: 4px; }
 
 <script type="module">
 import { decide, trackStage, createMemory, markDone, DEFAULT_CONFIG } from "/decide.js";
+import { createLatestRequest } from "/latest-request.js";
 import { startSession, getCallAudio, getMicAudio } from "/capture.js";
 import { listCoaches, getCoach, buildCoach, onCoachesChanged } from "/coaches.js";
 import { apiHeaders, getKey, getAccessCode, setKey } from "/access.js";
@@ -578,7 +579,7 @@ const GAUGE_ARC = GAUGE_CIRC * (240 / 360);
 
 const app = {
   turns: [], speaker: "customer", listening: false,
-  inFlight: false, pending: false, timer: null, sampleId: 0,
+  inFlight: false, timer: null, sampleId: 0,
   memory: createMemory(), result: null, shownScore: null, lastSignals: null
 };
 
@@ -1055,23 +1056,22 @@ function showError(msg) {
 }
 
 /* ---------- Jev + local logic ---------- */
-function scheduleEvaluate() { clearTimeout(app.timer); app.timer = setTimeout(evaluate, 350); }
+const coachingRequest = createLatestRequest({
+  headers: apiHeaders,
+  onBusy: (busy) => { app.inFlight = busy; setActivity(); },
+});
+function scheduleEvaluate() {
+  coachingRequest.invalidate();
+  clearTimeout(app.timer);
+  app.timer = setTimeout(evaluate, 350);
+}
 
 async function evaluate() {
   if (!app.turns.some((t) => t.speaker === "customer")) return;
-  if (app.inFlight) { app.pending = true; return; }
-  app.inFlight = true; setActivity();
-  const sampleId = app.sampleId;
+  clearTimeout(app.timer);
   try {
-    const res = await fetch("/api/evaluate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...apiHeaders() },
-      // Custom coaches send their questions along; built-in modes are known to the server
-      body: JSON.stringify({ ...(COACH ? { coach: COACH } : { mode: MODE.id }), turns: app.turns })
-    });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(data.error || `The server returned status ${res.status}.`);
-    if (sampleId !== app.sampleId) return;
+    const data = await coachingRequest.run({ ...(COACH ? { coach: COACH } : { mode: MODE.id }), turns: app.turns });
+    if (!data) return;
     showError("");
 
     const stage = trackStage(data.answers[PLAYBOOK.questions.stage], app.memory.stage, STAGES, CONFIG);
@@ -1106,15 +1106,13 @@ async function evaluate() {
     if (parts.length) $("announce").textContent = parts.join(" ");
   } catch (err) {
     showError(err instanceof TypeError ? "Can't reach the local server. Check that node server.mjs is still running." : err.message);
-  } finally {
-    app.inFlight = false; setActivity();
-    if (app.pending) { app.pending = false; evaluate(); }
   }
 }
 
 function addTurn(text, { speaker = app.speaker, merge = false, evaluate = true } = {}) {
   text = text.trim();
   if (!text) return;
+  coachingRequest.invalidate();
   const prev = app.turns[app.turns.length - 1];
   if (merge && prev && prev.merge && prev.speaker === speaker && Date.now() - prev.at < 15000) { prev.text += " " + text; prev.at = Date.now(); }
   else app.turns.push({ speaker, text, at: Date.now(), merge });
@@ -1309,8 +1307,9 @@ $("overlayMode").addEventListener("click", changeMode);
 
 function resetCall() {
   app.sampleId++;
+  coachingRequest.invalidate();
   clearTimeout(app.timer);
-  app.turns = []; app.memory = createMemory(); app.result = null; app.pending = false; app.lastSignals = null;
+  app.turns = []; app.memory = createMemory(); app.result = null; app.lastSignals = null;
   showHeard("", "customer"); showError(""); $("doneMsg").textContent = "";
   $("sample").disabled = false;
   renderStageIdle(); renderNextIdle();
@@ -1326,6 +1325,7 @@ $("sample").addEventListener("click", async () => {
   $("sample").disabled = true;
   for (const [speaker, text] of PLAYBOOK.sample) {
     if (id !== app.sampleId) return;
+    coachingRequest.invalidate();
     app.turns.push({ speaker, text, at: 0 });
     showHeard(text, speaker);
     if (overlayChannel) overlayChannel.postMessage({ type: "turn", speaker, text });
@@ -1572,6 +1572,7 @@ function submitAnswer() {
 }
 
 function retryAnswer() {
+  coachingRequest.invalidate();
   if (app.turns.at(-1)?.speaker === "rep") app.turns.pop();
   practice.answered = false;
   if (practice.handsFree) $("answerIn").value = "";
@@ -1582,6 +1583,7 @@ function retryAnswer() {
 }
 
 function nextLine() {
+  coachingRequest.invalidate();
   const sc = PLAYBOOK.scenarios[practice.scenario];
   if (practice.line >= sc.lines.length - 1) { startScenario(practice.scenario); return; }
   practice.line++;

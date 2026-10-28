@@ -4,6 +4,6 @@ import { json, route, headers, readJson } from "../lib/web.mjs";
 
 export const POST = route(async (request) => {
   const header = headers(request);
-  const [status, payload] = await evaluate({ header, ip: clientIp(header), readJson: () => readJson(request) });
+  const [status, payload] = await evaluate({ header, ip: clientIp(header), readJson: () => readJson(request), signal: request.signal });
   return json(status, payload);
 });

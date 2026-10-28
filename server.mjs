@@ -15,6 +15,7 @@ import {
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC = path.join(HERE, "public");
 const PORT = Number(process.env.PORT || 3000);
+const BIND_HOST = process.env.BIND_HOST || (HOSTED ? "0.0.0.0" : "127.0.0.1");
 let ASR_MODEL = process.env.ASR_MODEL || "onnx-community/whisper-base.en";
 
 // Where downloaded speech models go. The desktop app points this at its user data
@@ -153,6 +154,13 @@ function quickReady() {
 const server = http.createServer(async (req, res) => {
   try {
     const url = new URL(req.url, `http://${req.headers.host}`);
+    // Local mode can spend the configured key: reject DNS rebinding and cross-site POSTs.
+    if (!HOSTED && !["localhost", "127.0.0.1", "[::1]"].includes(url.hostname)) {
+      return sendJson(res, 403, { error: "Local coaching requires a localhost address." });
+    }
+    if (req.method === "POST" && req.headers.origin && req.headers.origin !== url.origin) {
+      return sendJson(res, 403, { error: "Cross-site requests are not allowed." });
+    }
     const serverSpeech = TRANSCRIBE === "server";
     const header = (name) => req.headers[name];
 
@@ -198,7 +206,12 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (req.method === "POST" && url.pathname === "/api/evaluate") {
-      const [status, payload] = await evaluate({ header, ip: clientIp(header, req.socket.remoteAddress), readJson: () => readJson(req) });
+      const abort = new AbortController();
+      const cancel = () => { if (!res.writableEnded) abort.abort(); };
+      res.on("close", cancel);
+      const [status, payload] = await evaluate({ header, ip: clientIp(header, req.socket.remoteAddress), readJson: () => readJson(req), signal: abort.signal });
+      res.off("close", cancel);
+      if (res.destroyed) return;
       return sendJson(res, status, payload);
     }
 
@@ -230,7 +243,7 @@ const server = http.createServer(async (req, res) => {
             const headers = { "Content-Type": mime, "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" };
             // Cross-origin isolation lets in-browser speech recognition use several threads.
             // Workers need the same headers as the page that starts them.
-            if (HOSTED && (ext === ".html" || ext === ".js")) Object.assign(headers, { "Cross-Origin-Opener-Policy": "same-origin", "Cross-Origin-Embedder-Policy": "credentialless" });
+            if (TRANSCRIBE === "browser" && (ext === ".html" || ext === ".js")) Object.assign(headers, { "Cross-Origin-Opener-Policy": "same-origin", "Cross-Origin-Embedder-Policy": "credentialless" });
             res.writeHead(200, headers);
             return res.end(content);
           } catch {}
@@ -244,7 +257,7 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-server.listen(PORT, () => {
+server.listen(PORT, BIND_HOST, () => {
   console.log(`Call Coach running at http://localhost:${PORT}${HOSTED ? " (hosted)" : ""}`);
   const access = accessSummary();
   if (access) (access.startsWith("Warning") ? console.warn : console.log)(access);
