@@ -1,0 +1,20 @@
+{
+  "checked_at": "2026-10-28T17:18:38.503Z",
+  "scope": "Locally synthesized speech through actual CPU Whisper-base recognizer and real Jev HTTP inference. Not physical microphone, browser/WebGPU, or acoustic acceptance.",
+  "passed": true,
+  "speech_model": "onnx-community/whisper-base.en",
+  "device": "cpu",
+  "dtype": "q8",
+  "audio_seconds": 12.8180625,
+  "asr_ms": 1827,
+  "recognized_text": " Hi, this is Sam at American Dream Motors. The Toyota Camry is available. The full total is $23,800. Would you like to visit tomorrow at 10 in the morning?",
+  "jev_model": "jev-1.14.0",
+  "jev_latency_ms": 135,
+  "reply_quality": "clear",
+  "visit_ask_probability": 0.98,
+  "trace": {
+    "contract_hash": "4870db755788655eef79b5f5b2021ca013be8717579866a5ce052f0ec5c167c2",
+    "state_hash": "a2cdbd4d74a6e69b13de4caa47650760f1c1d568408823e6c1c362df8778e740"
+  },
+  "model_load_ms": 972
+}

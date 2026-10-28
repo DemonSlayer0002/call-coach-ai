@@ -1,0 +1,237 @@
+{
+  "checked_at": "2026-10-28T17:14:40.842Z",
+  "scope": "Synthetic playback controller and actual local HTTP/Jev path. No visual browser or real call acceptance claimed.",
+  "results": [
+    {
+      "scenario": "price",
+      "lines": 8,
+      "passed": true,
+      "readings": [
+        {
+          "after_line": 2,
+          "action": "handle_objection",
+          "model": "jev-1.14.0",
+          "latency_ms": 180,
+          "trace": {
+            "contract_hash": "4870db755788655eef79b5f5b2021ca013be8717579866a5ce052f0ec5c167c2",
+            "state_hash": "10a36676a59cb82d0793a1ecf270b40f6d4569abca52f30f4e779738e0bb6e2d"
+          }
+        },
+        {
+          "after_line": 3,
+          "action": "handle_objection",
+          "model": "jev-1.14.0",
+          "latency_ms": 96,
+          "trace": {
+            "contract_hash": "4870db755788655eef79b5f5b2021ca013be8717579866a5ce052f0ec5c167c2",
+            "state_hash": "8d871b501947be59478a779d6b6aca4bd6573e398b92f64c188bc5e4e280ef46"
+          }
+        },
+        {
+          "after_line": 4,
+          "action": "handle_objection",
+          "model": "jev-1.14.0",
+          "latency_ms": 132,
+          "trace": {
+            "contract_hash": "4870db755788655eef79b5f5b2021ca013be8717579866a5ce052f0ec5c167c2",
+            "state_hash": "63f2b8cbdd2503ac4d1e37e09b4ea4a50cf3c1eb1f14431f025dd0c987563dc8"
+          }
+        },
+        {
+          "after_line": 5,
+          "action": "handle_objection",
+          "model": "jev-1.14.0",
+          "latency_ms": 102,
+          "trace": {
+            "contract_hash": "4870db755788655eef79b5f5b2021ca013be8717579866a5ce052f0ec5c167c2",
+            "state_hash": "a2b6cad374d199d9720670046ebd70e6dff17658252d8aea123d69ec72865f66"
+          }
+        },
+        {
+          "after_line": 6,
+          "action": "listen",
+          "model": "jev-1.14.0",
+          "latency_ms": 86,
+          "trace": {
+            "contract_hash": "4870db755788655eef79b5f5b2021ca013be8717579866a5ce052f0ec5c167c2",
+            "state_hash": "d789f8ceb90672050ad8768443aee1609749da1c4266559aab09db5c803a77b8"
+          }
+        },
+        {
+          "after_line": 7,
+          "action": "listen",
+          "model": "jev-1.14.0",
+          "latency_ms": 84,
+          "trace": {
+            "contract_hash": "4870db755788655eef79b5f5b2021ca013be8717579866a5ce052f0ec5c167c2",
+            "state_hash": "8544afa7260a7cfbb5f20a78e859fdec0678a9ce9214e232bf6ae1bca6abea88"
+          }
+        },
+        {
+          "after_line": 8,
+          "action": "book_visit",
+          "model": "jev-1.14.0",
+          "latency_ms": 167,
+          "trace": {
+            "contract_hash": "4870db755788655eef79b5f5b2021ca013be8717579866a5ce052f0ec5c167c2",
+            "state_hash": "9cc3597e493c2c16e8029cf889f083cf8090df7bdd7e8ae6ca1905bb3afa8770"
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "history",
+      "lines": 8,
+      "passed": true,
+      "readings": [
+        {
+          "after_line": 2,
+          "action": "handle_objection",
+          "model": "jev-1.14.0",
+          "latency_ms": 77,
+          "trace": {
+            "contract_hash": "4870db755788655eef79b5f5b2021ca013be8717579866a5ce052f0ec5c167c2",
+            "state_hash": "f8b052f2cdac12c95df93db73d4b5ce8b612651690a268329332e887bbe53fdf"
+          }
+        },
+        {
+          "after_line": 3,
+          "action": "handle_objection",
+          "model": "jev-1.14.0",
+          "latency_ms": 87,
+          "trace": {
+            "contract_hash": "4870db755788655eef79b5f5b2021ca013be8717579866a5ce052f0ec5c167c2",
+            "state_hash": "33eb331a576b7691b123af0a30a309da30c666f3bb71ff2760cc58c32c9d905a"
+          }
+        },
+        {
+          "after_line": 4,
+          "action": "handle_objection",
+          "model": "jev-1.14.0",
+          "latency_ms": 109,
+          "trace": {
+            "contract_hash": "4870db755788655eef79b5f5b2021ca013be8717579866a5ce052f0ec5c167c2",
+            "state_hash": "b155ec57ec28fe6c0b02ac0e3ac71ca0af39648ecd2b872a315fa0c1f72b7b55"
+          }
+        },
+        {
+          "after_line": 5,
+          "action": "handle_objection",
+          "model": "jev-1.14.0",
+          "latency_ms": 102,
+          "trace": {
+            "contract_hash": "4870db755788655eef79b5f5b2021ca013be8717579866a5ce052f0ec5c167c2",
+            "state_hash": "8ce56cf9ff3e8ec2f5f45de98efef6ec8d89f4e687340c1a5fe8359de27d93c2"
+          }
+        },
+        {
+          "after_line": 6,
+          "action": "handle_objection",
+          "model": "jev-1.14.0",
+          "latency_ms": 80,
+          "trace": {
+            "contract_hash": "4870db755788655eef79b5f5b2021ca013be8717579866a5ce052f0ec5c167c2",
+            "state_hash": "01a05da2caa0e1f74bf735e5632570090c9b6989637281d664324f34133fffd6"
+          }
+        },
+        {
+          "after_line": 7,
+          "action": "handle_objection",
+          "model": "jev-1.14.0",
+          "latency_ms": 99,
+          "trace": {
+            "contract_hash": "4870db755788655eef79b5f5b2021ca013be8717579866a5ce052f0ec5c167c2",
+            "state_hash": "04ec0dfff8f865f512198a288ba0f1f6f3e01b87a63eebbc0039714d0e0af942"
+          }
+        },
+        {
+          "after_line": 8,
+          "action": "agree_follow_up",
+          "model": "jev-1.14.0",
+          "latency_ms": 98,
+          "trace": {
+            "contract_hash": "4870db755788655eef79b5f5b2021ca013be8717579866a5ce052f0ec5c167c2",
+            "state_hash": "1138b88f2afac5621fbabd550e8f2cbf925d2e4879ca89e1ec521bb9ddb849f2"
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "visit",
+      "lines": 8,
+      "passed": true,
+      "readings": [
+        {
+          "after_line": 2,
+          "action": "listen",
+          "model": "jev-1.14.0",
+          "latency_ms": 99,
+          "trace": {
+            "contract_hash": "4870db755788655eef79b5f5b2021ca013be8717579866a5ce052f0ec5c167c2",
+            "state_hash": "b4c347ae465a89841555242c1c000c596452f4011b0d0b900d3a0b50bacd31df"
+          }
+        },
+        {
+          "after_line": 3,
+          "action": "ask_discovery_question",
+          "model": "jev-1.14.0",
+          "latency_ms": 86,
+          "trace": {
+            "contract_hash": "4870db755788655eef79b5f5b2021ca013be8717579866a5ce052f0ec5c167c2",
+            "state_hash": "58d90592396d58a917da286330da17286ff7717834e515635e92d0a400c7ffaa"
+          }
+        },
+        {
+          "after_line": 4,
+          "action": "verify_vehicle",
+          "model": "jev-1.14.0",
+          "latency_ms": 76,
+          "trace": {
+            "contract_hash": "4870db755788655eef79b5f5b2021ca013be8717579866a5ce052f0ec5c167c2",
+            "state_hash": "abf40ceb992c20a2d7acba47270b75962d8db668ca9eadac581011cf14178223"
+          }
+        },
+        {
+          "after_line": 5,
+          "action": "listen",
+          "model": "jev-1.14.0",
+          "latency_ms": 79,
+          "trace": {
+            "contract_hash": "4870db755788655eef79b5f5b2021ca013be8717579866a5ce052f0ec5c167c2",
+            "state_hash": "e742b9385db7355f5c286839163a79d20ec7c55a384a1be087a9bfd4545b4cf1"
+          }
+        },
+        {
+          "after_line": 6,
+          "action": "book_visit",
+          "model": "jev-1.14.0",
+          "latency_ms": 78,
+          "trace": {
+            "contract_hash": "4870db755788655eef79b5f5b2021ca013be8717579866a5ce052f0ec5c167c2",
+            "state_hash": "6c885bd147da9cc2264fe149bd314fe25dae762876f1f2174c668c82adacba4c"
+          }
+        },
+        {
+          "after_line": 7,
+          "action": "book_visit",
+          "model": "jev-1.14.0",
+          "latency_ms": 102,
+          "trace": {
+            "contract_hash": "4870db755788655eef79b5f5b2021ca013be8717579866a5ce052f0ec5c167c2",
+            "state_hash": "02a07e2bc8834f55f4298fa18680aae6227d18e1c5d7d36638a1ca6ae675fcb6"
+          }
+        },
+        {
+          "after_line": 8,
+          "action": "book_visit",
+          "model": "jev-1.14.0",
+          "latency_ms": 94,
+          "trace": {
+            "contract_hash": "4870db755788655eef79b5f5b2021ca013be8717579866a5ce052f0ec5c167c2",
+            "state_hash": "8ee41d9c589f15035f409ba9bcf679e26ac0021961ab2213cffd1ee61477ce8d"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -19,7 +19,7 @@ export function speechLocation() {
 export function browserModel() {
   let id = null;
   try { id = localStorage.getItem(MODEL_KEY); } catch {}
-  return BROWSER_MODELS.some((m) => m.id === id) ? id : BROWSER_MODELS[0].id;
+  return BROWSER_MODELS.some((m) => m.id === id) ? id : BROWSER_MODELS[1].id;
 }
 export function setBrowserModel(id) {
   try { localStorage.setItem(MODEL_KEY, id); } catch {}
@@ -36,10 +36,18 @@ export function onModelProgress(fn) {
   return () => progressListeners.delete(fn);
 }
 
+function resetWorker(message) {
+  const previous = worker; worker = null;
+  previous?.terminate();
+  for (const p of pending.values()) p.reject(new Error(message));
+  pending.clear();
+}
 function getWorker() {
   if (worker) return worker;
-  worker = new Worker("/asr-worker.js", { type: "module" });
-  worker.onmessage = (e) => {
+  const created = new Worker("/asr-worker.js", { type: "module" });
+  worker = created;
+  created.onmessage = (e) => {
+    if (worker !== created) return;
     const d = e.data;
     if (d.type === "progress") { progressListeners.forEach((fn) => fn(d)); return; }
     const p = pending.get(d.id);
@@ -47,12 +55,10 @@ function getWorker() {
     pending.delete(d.id);
     d.error ? p.reject(new Error(d.error)) : p.resolve({ text: d.text });
   };
-  worker.onerror = (e) => {
-    for (const p of pending.values()) p.reject(new Error(e.message || "Speech recognition failed to load."));
-    pending.clear();
-    worker = null;
+  created.onerror = (e) => {
+    if (worker === created) resetWorker(e.message || "Speech recognition failed to load.");
   };
-  return worker;
+  return created;
 }
 
 /** Returns { text }, or throws. `quick` asks for the fast model, for live transcripts. */
@@ -62,12 +68,35 @@ export async function transcribe(pcm, { quick = false } = {}) {
   if (place === "browser") {
     return new Promise((resolve, reject) => {
       const id = ++nextId;
-      pending.set(id, { resolve, reject });
-      getWorker().postMessage({ id, pcm, model: browserModel() }, [pcm.buffer]);
+      const timer = setTimeout(() => resetWorker("Speech recognition took too long. End practice and try again with the faster model."), 45000);
+      pending.set(id, {
+        resolve: value => { clearTimeout(timer); resolve(value); },
+        reject: err => { clearTimeout(timer); reject(err); },
+      });
+      try { getWorker().postMessage({ id, pcm, model: browserModel() }, [pcm.buffer]); }
+      catch (err) { clearTimeout(timer); pending.delete(id); reject(err); }
     });
   }
   const res = await fetch(`/api/transcribe${quick ? "?quick=1" : ""}`, { method: "POST", headers: { "Content-Type": "application/octet-stream" }, body: pcm.buffer });
   const data = await res.json();
   if (data.error) throw new Error(data.error);
   return { text: data.text || "" };
+}
+
+// Warm the model before asking someone to speak; abort stops the waiting caller.
+export async function prepareSpeech({ signal } = {}) {
+  const place = await speechLocation();
+  if (place === "off") throw new Error("Speech recognition is turned off on this server.");
+  if (place !== "browser") return;
+  signal?.throwIfAborted();
+  return new Promise((resolve, reject) => {
+    const id = ++nextId;
+    const cleanup = () => { clearTimeout(timer); signal?.removeEventListener("abort", cancel); pending.delete(id); };
+    const cancel = () => { cleanup(); reject(signal.reason); };
+    const timer = setTimeout(() => resetWorker("The speech model did not finish loading. Check your connection and try again."), 120000);
+    pending.set(id, { resolve: value => { cleanup(); resolve(value); }, reject: err => { cleanup(); reject(err); } });
+    signal?.addEventListener("abort", cancel, { once: true });
+    try { getWorker().postMessage({ type: "load", id, model: browserModel() }); }
+    catch (err) { cleanup(); reject(err); }
+  });
 }

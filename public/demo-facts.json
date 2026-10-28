@@ -1,0 +1,70 @@
+{
+  "price": {
+    "vehicle": "2021 Toyota RAV4",
+    "source": "Synthetic practice facts; not actual inventory or an offer",
+    "facts": [
+      "The example RAV4 is available.",
+      "The complete example out-the-door total is $24,500.",
+      "The competing example quote excludes fees; compare complete written totals.",
+      "Example visit times: Saturday at 10 am or 2 pm.",
+      "Vehicle history and financing approval have not been verified. Do not promise either."
+    ],
+    "questions": [
+      "Hi, is the 2021 RAV4 available, and what would I actually pay with every fee included?",
+      "I found another one for two thousand less. Why should I spend more with you?",
+      "I see the complete quotes now. That resolves the price concern. Our budget is twenty-five thousand and we need a car this month. My wife is deciding with me. What is the next step?",
+      "A test drive sounds good. Saturday at ten would work for us. Can you confirm the vehicle and appointment details?"
+    ],
+    "answers": {
+      "verify_vehicle": "The 2021 Toyota RAV4 is available. What would you like to know before coming to see it?",
+      "explain_price": "The full out-the-door total is $24,500, including the taxes and fees. What budget do you want to stay within?",
+      "handle_objection": "Let’s compare the complete written quotes. The lower quote excludes fees; I can show you both full totals so you can compare them fairly.",
+      "book_visit": "Would Saturday at 10 in the morning or 2 in the afternoon work for you and your wife to drive the RAV4?",
+      "explain_finance": "I can explain the application process, but I cannot promise approval or a rate before a lender reviews the application."
+    }
+  },
+  "history": {
+    "vehicle": "2020 Honda CR-V",
+    "source": "Synthetic practice facts; not actual inventory or an offer",
+    "facts": [
+      "The customer is interested in the example 2020 Honda CR-V.",
+      "Accident history and structural condition are unknown.",
+      "Independent inspection arrangements must be verified with the dealership.",
+      "You can offer to check the available vehicle records and agree on a follow-up.",
+      "Do not claim the vehicle is accident-free or promise inspection terms you have not verified."
+    ],
+    "questions": [
+      "I like the 2020 CR-V, but I am worried about its accident history. Has it had structural damage?",
+      "I need it for a daily commute. What records can you get me so I can decide?",
+      "Can I arrange an independent inspection? I would need that before moving forward.",
+      "Please call tomorrow afternoon once you have checked those details. What will you verify before calling?"
+    ],
+    "answers": {
+      "handle_objection": "I do not have verified structural history yet. I will check the available history and inspection records before giving you an answer.",
+      "agree_follow_up": "I’ll verify the available history and inspection options, then call you tomorrow afternoon. Is that the best time to reach you?"
+    }
+  },
+  "visit": {
+    "vehicle": "2022 Toyota Camry",
+    "source": "Synthetic practice facts; not actual inventory or an offer",
+    "facts": [
+      "The example 2022 Toyota Camry is available.",
+      "The complete example out-the-door total is $23,800.",
+      "Example appointment times: tomorrow at 10 am or 2 pm.",
+      "No lender decision or financing rate is available.",
+      "Confirm the exact vehicle, day and time. An appointment is only agreed when both sides accept it."
+    ],
+    "questions": [
+      "Hi, I need a reliable sedan for commuting and want to buy this week. Can you help me?",
+      "Is the 2022 Camry available, and what is the full out-the-door total?",
+      "That total works. I would like to drive it. What times could I come tomorrow?",
+      "Ten tomorrow morning works for my partner and me. Could you confirm what we have agreed?"
+    ],
+    "answers": {
+      "verify_vehicle": "I have checked the 2022 Toyota Camry, and it is available. What would you like to know before a visit?",
+      "explain_price": "The complete out-the-door total is $23,800, including the taxes and fees.",
+      "book_visit": "Would tomorrow at 10 in the morning or 2 in the afternoon work for you to test drive the Camry?",
+      "explain_finance": "Lender approval and terms are not confirmed. I can explain how to apply without promising an outcome."
+    }
+  }
+}

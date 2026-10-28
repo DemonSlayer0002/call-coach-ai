@@ -11,6 +11,8 @@
 // delivered in the order they finished.
 
 import { transcribe } from "/transcriber.js";
+import { isHallucination } from "/speech-quality.js";
+export { isHallucination } from "/speech-quality.js";
 
 export const SAMPLE_RATE = 16000;
 
@@ -21,19 +23,6 @@ export const ECHO = { minCorr: 0.6, minOverlap: 0.6, minOwnFrames: 10 };
 const BEHIND_AT = 3;                              // segments waiting before we warn
 const MERGE_MAX = SAMPLE_RATE * 25;               // Whisper hears at most 30 s per request
 const MERGE_GAP = new Float32Array(SAMPLE_RATE / 5); // 200 ms of silence between merged segments
-
-const HALLUCINATIONS = new Set([
-  "you", "thank you", "thanks for watching", "subscribe",
-  "bye", "the end", "thanks for listening",
-]);
-
-export function isHallucination(text) {
-  if (/^[\s[(*♪].*[\])*♪\s]$/.test(text)) return true; // [BLANK_AUDIO], (silence), *music*
-  const lower = text.toLowerCase().replace(/[.!?,\s]+/g, " ").trim();
-  if (!lower || HALLUCINATIONS.has(lower)) return true;
-  const words = lower.split(" ");
-  return words.length <= 3 && words.every((w) => w === words[0]);
-}
 
 /** Call audio: the desktop in Electron, a shared tab or screen in the browser. */
 export async function getCallAudio() {
@@ -79,7 +68,7 @@ export function getMicAudio() {
  * Returns { stop(), settled() }.
  */
 export async function startSession(sources, handlers = {}) {
-  const { onText = () => {}, onDrop = () => {}, onBehind = () => {}, onError = () => {}, onEnded = () => {} } = handlers;
+  const { onSegment = () => {}, onText = () => {}, onDrop = () => {}, onBehind = () => {}, onError = () => {}, onEnded = () => {} } = handlers;
   const { onPartial = () => {}, onVoice = () => {}, onLevel = () => {} } = handlers;
   const ctx = new AudioContext({ sampleRate: SAMPLE_RATE });
   let running = true;
@@ -109,10 +98,11 @@ export async function startSession(sources, handlers = {}) {
       busy = true;
       const { speaker } = queue[0];
       const parts = [];
-      let len = 0;
+      let len = 0, lastSequence = 0;
       while (queue.length && queue[0].speaker === speaker && (!parts.length || len + MERGE_GAP.length + queue[0].pcm.length <= MERGE_MAX)) {
         if (parts.length) { parts.push(MERGE_GAP); len += MERGE_GAP.length; }
-        const { pcm } = queue.shift();
+        const { pcm, sequence } = queue.shift();
+        lastSequence = sequence;
         parts.push(pcm);
         len += pcm.length;
       }
@@ -121,7 +111,7 @@ export async function startSession(sources, handlers = {}) {
       for (const p of parts) { pcm.set(p, off); off += p.length; }
       try {
         const text = (await transcribe(pcm)).text.trim();
-        if (text && !isHallucination(text)) onText(speaker, text); // includes segments flushed by stop()
+        if (text && !isHallucination(text)) onText(speaker, text, { sequence: lastSequence }); // includes segments flushed by stop()
         else onDrop(speaker, "noise");
       } catch (err) {
         console.error("Transcription error:", err);
@@ -156,7 +146,8 @@ export async function startSession(sources, handlers = {}) {
       if (type === "partial") { partial(speaker, pcm); return; }
       if (echo?.dropped) { onDrop(speaker, "echo", echo); return; }
       finals++;
-      queue.push({ speaker, pcm });
+      onSegment(speaker, finals);
+      queue.push({ speaker, pcm, sequence: finals });
       if (queue.length >= BEHIND_AT && !warned) { warned = true; onBehind(queue.length); }
       pump();
     };

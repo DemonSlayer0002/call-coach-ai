@@ -14,7 +14,13 @@ Use Node 22.9 or newer. Copy `.env.example` to `.env`, supply a TypeSafe key, an
 
 The local server binds to `127.0.0.1` by default. `.env` is ignored by Git. The configured provider key stays on the server; it is not served to the browser. The current workstation uses a private file with mode 0600. Never paste a provider key into committed files.
 
-Choose **Automotive sales** for vehicle-shopping calls or **Sales call** for general sales. The automotive mode asks about needs, availability, total price, trade-ins, financing process, decision makers, concerns, visits, and follow-up. Suggested wording is curated in the playbook; Jev selects among typed options rather than generating unsupported product claims.
+The primary screen is now a focused automotive sales demo. Choose one of its three scenarios, play/pause or advance the conversation, and add your own customer or rep wording. The general-sales API mode remains available for development. The automotive mode asks about needs, availability, total price, trade-ins, financing process, decision makers, concerns, visits, and follow-up. Suggested wording is curated in the playbook; Jev selects among typed options rather than generating unsupported product claims.
+
+## Demo interface
+
+The former multipurpose main screen was removed. The replacement uses a transcript-first layout, one prominent coaching recommendation, a separate ordinal shopping stage, and evidence states for vehicle needs, budget, timing and decision maker. Controls cover all three scenarios, pause/replay/single-step, manual input, microphone-only spoken practice, a live-session picker and optional browser-call capture. Spoken practice warms the recognizer, mutes the microphone during customer speech, distinguishes pending transcription from completed answers, and closes acquired streams on stop/source changes. It adds eight coverage checkpoints, reference-grounded rep-reply feedback, and bundled customer speech clips for browsers without installed voices. See USING-THE-DEMO.md for the operator flow. Errors remain visible and retryable.
+
+The blue/white workspace, dark guidance area and local Schibsted typeface keep the conversation readable. CSS and icons are inline, small screens place coaching ahead of the transcript, keyboard focus is visible, and reduced-motion preferences suppress transcript animation. Scenario playback is tested for ordering, pause and switching cancellation. These checks supplement, rather than establish, visual acceptance.
 
 ## Reliability and uncertainty
 
@@ -33,7 +39,7 @@ The workstation configuration pins `jev-1.14.0`, which accepted the live evaluat
 
 Run `npm test` and `npm run check-modes` without a provider key. Tests include provider failures, cancellation, stale responses, probability gates, transcript quality, identity isolation, deduplication, incomplete coverage, and an HTTP path against a deterministic local provider.
 
-`npm run eval:live` explicitly makes paid TypeSafe requests against authored synthetic fixtures. It writes `docs/synthetic-evaluation.json`, containing model/contract/input/policy identities, probabilities, usage and timing. The recorded run matched all 16 expected action and objection labels; median provider-wrapper time was 97 ms and p95 was 359 ms. One initial discovery/objection ambiguity was found and the rubric clarified before this recorded run.
+`npm run eval:live` explicitly makes paid TypeSafe requests against authored synthetic fixtures. It writes `docs/synthetic-evaluation.json`, containing model/contract/input/policy identities, probabilities, usage and timing. The recorded run matched all 16 expected action and objection labels; median provider-wrapper time was 95 ms and p95 was 204 ms. One initial discovery/objection ambiguity was found and the rubric clarified before this recorded run.
 
 These fixtures are development regressions, not a held-out benchmark, independent human labels, real-call accuracy, or an end-to-end audio latency measurement. Browser rendering, microphone permissions, acoustic quality and operator acceptance still need a connected-browser/real-call test. No computer-use browser was connected during this session.
 

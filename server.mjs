@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 import os from "node:os";
 import { createLiveTranscriptStore, authorizeLiveIngest } from "./lib/live-transcript.mjs";
+import { expectedOrigin } from "./lib/web.mjs";
 import {
   HOSTED, TRANSCRIBE, MAX_BODY_BYTES, TOO_MANY,
   getModes, listModes, health, evaluate, clientIp, overLimit, accessSummary,
@@ -48,6 +49,7 @@ const MIME = {
   ".png":  "image/png",
   ".ico":  "image/x-icon",
   ".woff2": "font/woff2",
+  ".wav": "audio/wav",
 };
 
 function sendJson(res, status, payload) {
@@ -160,7 +162,10 @@ const server = http.createServer(async (req, res) => {
     if (!HOSTED && !["localhost", "127.0.0.1", "[::1]"].includes(url.hostname)) {
       return sendJson(res, 403, { error: "Local coaching requires a localhost address." });
     }
-    if (req.method === "POST" && req.headers.origin && req.headers.origin !== url.origin) {
+    const publicOrigin = expectedOrigin(req.headers.host, req.headers["x-forwarded-proto"], {
+      trustProxy: process.env.TRUST_PROXY === "1", publicOrigin: process.env.PUBLIC_ORIGIN || "",
+    });
+    if (req.method === "POST" && req.headers.origin && req.headers.origin !== publicOrigin) {
       return sendJson(res, 403, { error: "Cross-site requests are not allowed." });
     }
     const serverSpeech = TRANSCRIBE === "server";

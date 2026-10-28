@@ -42,6 +42,7 @@ onmessage = (e) => {
         loaded = model;
         postMessage({ type: "progress", pct: 100, model, ready: true });
       }
+      if (e.data.type === "load") { postMessage({ id, text: "" }); return; }
       const result = await asr(pcm);
       postMessage({ id, text: result.text || "" });
     } catch (err) {

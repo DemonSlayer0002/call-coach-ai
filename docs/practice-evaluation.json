@@ -1,0 +1,234 @@
+{
+  "checked_at": "2026-10-28T17:14:39.649Z",
+  "scope": "Authored synthetic text checks of voice-practice inference. Does not prove microphone, TTS, visual rendering or real-call accuracy.",
+  "passed": 9,
+  "total": 9,
+  "results": [
+    {
+      "id": "verified-price-and-introduction",
+      "passed": true,
+      "expected_quality": "clear",
+      "quality": "clear",
+      "quality_probabilities": {
+        "waiting": 0,
+        "clear": 1,
+        "incomplete": 0,
+        "unsupported": 0
+      },
+      "checks": {
+        "rep_introduced": {
+          "expected": true,
+          "probability": 0.99,
+          "passed": true
+        },
+        "rep_addressed_question": {
+          "expected": true,
+          "probability": 0.99,
+          "passed": true
+        }
+      },
+      "model": "jev-1.14.0",
+      "trace": {
+        "contract_hash": "4870db755788655eef79b5f5b2021ca013be8717579866a5ce052f0ec5c167c2",
+        "state_hash": "92cc2717143dc4ada001eb611b027ccc270c141379dfc4306432971d456835cc"
+      },
+      "latency_ms": 215
+    },
+    {
+      "id": "invented-price",
+      "passed": true,
+      "expected_quality": "unsupported",
+      "quality": "unsupported",
+      "quality_probabilities": {
+        "waiting": 0,
+        "clear": 0,
+        "incomplete": 0,
+        "unsupported": 1
+      },
+      "checks": {},
+      "model": "jev-1.14.0",
+      "trace": {
+        "contract_hash": "4870db755788655eef79b5f5b2021ca013be8717579866a5ce052f0ec5c167c2",
+        "state_hash": "78bc3e79a797503dda218ea10f87e6ccad19c52f71529e4bafc152a57e789a6b"
+      },
+      "latency_ms": 133
+    },
+    {
+      "id": "unverified-accident-claim",
+      "passed": true,
+      "expected_quality": "unsupported",
+      "quality": "unsupported",
+      "quality_probabilities": {
+        "waiting": 0,
+        "clear": 0,
+        "incomplete": 0,
+        "unsupported": 1
+      },
+      "checks": {},
+      "model": "jev-1.14.0",
+      "trace": {
+        "contract_hash": "4870db755788655eef79b5f5b2021ca013be8717579866a5ce052f0ec5c167c2",
+        "state_hash": "e3538c8ac396d84396e2e24d4d6cba6a9c60bc102f76e6332524fdef51fcea7c"
+      },
+      "latency_ms": 91
+    },
+    {
+      "id": "honest-history-verification",
+      "passed": true,
+      "expected_quality": "clear",
+      "quality": "clear",
+      "quality_probabilities": {
+        "waiting": 0,
+        "clear": 1,
+        "incomplete": 0,
+        "unsupported": 0
+      },
+      "checks": {
+        "rep_addressed_question": {
+          "expected": true,
+          "probability": 0.97,
+          "passed": true
+        }
+      },
+      "model": "jev-1.14.0",
+      "trace": {
+        "contract_hash": "4870db755788655eef79b5f5b2021ca013be8717579866a5ce052f0ec5c167c2",
+        "state_hash": "b54753c034f6279a08252f9b0ed7c9b0c993bf93113a0d70ecf5efeeb93cbd2d"
+      },
+      "latency_ms": 113
+    },
+    {
+      "id": "unverified-finance-guarantee",
+      "passed": true,
+      "expected_quality": "unsupported",
+      "quality": "unsupported",
+      "quality_probabilities": {
+        "waiting": 0,
+        "clear": 0,
+        "incomplete": 0,
+        "unsupported": 1
+      },
+      "checks": {
+        "approval_promised": {
+          "expected": true,
+          "probability": 0.99,
+          "passed": true
+        }
+      },
+      "model": "jev-1.14.0",
+      "trace": {
+        "contract_hash": "4870db755788655eef79b5f5b2021ca013be8717579866a5ce052f0ec5c167c2",
+        "state_hash": "ae1e9402c50e559283613ae6f996a14bcbb5170eaad3a63b64ab532b9b030482"
+      },
+      "latency_ms": 87
+    },
+    {
+      "id": "invitation-is-not-booking",
+      "passed": true,
+      "expected_quality": "clear",
+      "quality": "clear",
+      "quality_probabilities": {
+        "waiting": 0,
+        "clear": 0.99,
+        "incomplete": 0.01,
+        "unsupported": 0
+      },
+      "checks": {
+        "rep_asked_for_visit": {
+          "expected": true,
+          "probability": 0.98,
+          "passed": true
+        },
+        "appointment_agreed": {
+          "expected": false,
+          "probability": 0.02,
+          "passed": true
+        }
+      },
+      "model": "jev-1.14.0",
+      "trace": {
+        "contract_hash": "4870db755788655eef79b5f5b2021ca013be8717579866a5ce052f0ec5c167c2",
+        "state_hash": "4670f031ae68497ec65d0f66dbdfec5f7791133a7e860705ee468bb0ec1f9dec"
+      },
+      "latency_ms": 97
+    },
+    {
+      "id": "request-is-not-agreement",
+      "passed": true,
+      "quality": "waiting",
+      "quality_probabilities": {
+        "waiting": 1,
+        "clear": 0,
+        "incomplete": 0,
+        "unsupported": 0
+      },
+      "checks": {
+        "appointment_agreed": {
+          "expected": false,
+          "probability": 0.03,
+          "passed": true
+        }
+      },
+      "model": "jev-1.14.0",
+      "trace": {
+        "contract_hash": "4870db755788655eef79b5f5b2021ca013be8717579866a5ce052f0ec5c167c2",
+        "state_hash": "f9fbe90f5e8e50d207ae8dfff5cd1811f258b7d155a8b342eb1e6f05a212b649"
+      },
+      "latency_ms": 80
+    },
+    {
+      "id": "both-sides-agree",
+      "passed": true,
+      "quality": "waiting",
+      "quality_probabilities": {
+        "waiting": 1,
+        "clear": 0,
+        "incomplete": 0,
+        "unsupported": 0
+      },
+      "checks": {
+        "appointment_agreed": {
+          "expected": true,
+          "probability": 0.98,
+          "passed": true
+        },
+        "rep_asked_for_visit": {
+          "expected": true,
+          "probability": 0.99,
+          "passed": true
+        }
+      },
+      "model": "jev-1.14.0",
+      "trace": {
+        "contract_hash": "4870db755788655eef79b5f5b2021ca013be8717579866a5ce052f0ec5c167c2",
+        "state_hash": "903b2cbe449c9f3ed975202c9db50191f63a38b7a78cbc559e7447294761f853"
+      },
+      "latency_ms": 74
+    },
+    {
+      "id": "rep-confirms-request",
+      "passed": true,
+      "expected_quality": "clear",
+      "quality": "clear",
+      "quality_probabilities": {
+        "waiting": 0,
+        "clear": 0.98,
+        "incomplete": 0,
+        "unsupported": 0.02
+      },
+      "checks": {
+        "appointment_agreed": {
+          "expected": true,
+          "probability": 0.87,
+          "passed": true
+        }
+      },
+      "model": "jev-1.14.0",
+      "trace": {
+        "contract_hash": "4870db755788655eef79b5f5b2021ca013be8717579866a5ce052f0ec5c167c2",
+        "state_hash": "0bab12dc35a56c868b0c735494545440c98ed6c8d3e7d392dd510dd1dd3dfd67"
+      },
+      "latency_ms": 113
+    }
+  ]
+}

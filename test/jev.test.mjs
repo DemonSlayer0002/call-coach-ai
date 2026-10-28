@@ -22,6 +22,8 @@ test('accepts typed responses; rejects missing, nonfinite, wrong-type and unknow
     d => d.answers.objection.noul = NaN,
     d => d.answers.stage.score = 2,
     d => d.answers.action.choice = 'invented',
+    d => d.answers.action.choice = 'wait',
+    d => d.answers.stage.score = 1,
     d => d.answers.action.probabilities.ask = -1,
     d => d.answers.action.probabilities = { ask: 0.8 },
     d => d.answers.action.confidence = 2,
