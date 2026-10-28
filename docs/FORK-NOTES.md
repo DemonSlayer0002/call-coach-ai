@@ -44,3 +44,12 @@ Run `npm test` and `npm run check-modes` without a provider key. Tests include p
 These fixtures are development regressions, not a held-out benchmark, independent human labels, real-call accuracy, or an end-to-end audio latency measurement. Browser rendering, microphone permissions, acoustic quality and operator acceptance still need a connected-browser/real-call test. No computer-use browser was connected during this session.
 
 For the bridge contract and integration limits, see [LIVE-TRANSCRIPTS.md](LIVE-TRANSCRIPTS.md).
+
+
+## Existing VoiceClaude integration
+
+The initial browser recognizer did not work in the user's browser; the previous synthetic CPU test did not establish that path. The primary workstation configuration now bypasses browser model loading and routes 16 kHz float32 audio through the demo backend into existing VoiceClaude services. The backend converts audio in memory, uses the personal GPU worker through its existing loopback SSH tunnel when available, and retains local whisper.cpp as fallback. Neither service is bundled or restarted by the application.
+
+GPU requests have a six-second ceiling inside a 45-second overall recognition budget. Busy admission falls back immediately with a two-second cooldown; failures use a 30-second cooldown. Metadata reports the actual backend and measured speech time separately from Jev time. Configuration accepts only loopback provider URLs. The primary inference retains the native worker's Turbo/int8-float16/beam-5 quality settings.
+
+`docs/gpu-speech-benchmark.json` records three warm synthetic trials: 282–300 ms of inference and 517–631 ms including the connection, for 12.8 seconds of speech. The first cold inference was 10.77 seconds; warm timing must not be presented as a cold-start or live-microphone guarantee. `docs/voiceclaude-smoke.json` records the actual browser-client/PCM/HTTP path with browser workers disabled. Refresh the page after changing recognition backend.

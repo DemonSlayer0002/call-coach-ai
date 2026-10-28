@@ -1,0 +1,20 @@
+{
+  "checked_at": "2026-10-28T17:46:02.486Z",
+  "scope": "Dedicated personal GPU worker activation, persistence and demo routing. Actual synthetic inference recorded separately.",
+  "service": {
+    "ActiveState": "active",
+    "SubState": "running",
+    "UnitFileState": "enabled",
+    "ConditionResult": "yes",
+    "Result": "success",
+    "NoNewPrivileges": "yes",
+    "Linger": "yes"
+  },
+  "speech": {
+    "ready": true,
+    "backend": "gpu",
+    "busy": false,
+    "model": "large-v3-turbo",
+    "provider": "VoiceClaude"
+  }
+}

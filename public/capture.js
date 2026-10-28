@@ -110,8 +110,9 @@ export async function startSession(sources, handlers = {}) {
       let off = 0;
       for (const p of parts) { pcm.set(p, off); off += p.length; }
       try {
-        const text = (await transcribe(pcm)).text.trim();
-        if (text && !isHallucination(text)) onText(speaker, text, { sequence: lastSequence }); // includes segments flushed by stop()
+        const recognition = await transcribe(pcm);
+        const text = recognition.text.trim();
+        if (text && !isHallucination(text)) onText(speaker, text, { sequence: lastSequence, speech_backend: recognition.speech_backend, latency_ms: recognition.latency_ms }); // includes segments flushed by stop()
         else onDrop(speaker, "noise");
       } catch (err) {
         console.error("Transcription error:", err);

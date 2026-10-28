@@ -1,0 +1,28 @@
+{
+  "checked_at": "2026-10-28T17:44:49.730Z",
+  "passed": true,
+  "scope": "Synthetic PCM through the actual browser transcriber module, demo HTTP route, existing VoiceClaude model, and Jev. Browser worker deliberately unavailable. Physical microphone/AudioWorklet not exercised.",
+  "provider": "VoiceClaude",
+  "backend": "gpu",
+  "speech_model": "large-v3-turbo",
+  "recognition_server_ms": 682,
+  "audio_ready_to_coaching_ms": 841,
+  "recognized_text": "Hi, this is Sam at American Dream Motors. The Toyota Camry is available. The full total is $23,800. Would you like to visit tomorrow at 10 in the morning?",
+  "audio_route_ms": 709,
+  "browser_worker_used": false,
+  "requests": [
+    "/api/health",
+    "/api/speech/health",
+    "/api/health",
+    "/api/speech/health",
+    "/api/transcribe",
+    "/api/evaluate"
+  ],
+  "jev_model": "jev-1.14.0",
+  "jev_latency_ms": 125,
+  "reply_quality": "clear",
+  "trace": {
+    "contract_hash": "4870db755788655eef79b5f5b2021ca013be8717579866a5ce052f0ec5c167c2",
+    "state_hash": "c96b894dba3a222d86a28cd93b79f5bb981bff7f8e1e0a718143bc790853ce06"
+  }
+}

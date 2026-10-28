@@ -8,7 +8,7 @@ export function createVoicePractice({ getMic, prepareSpeech, startSession, speak
     op.phase = phase;
     onState({ phase, index: op.index, total: op.questions.length, replied: op.replied,
       canAdvance: op.replied && !op.hearing && !op.processing && !op.talking,
-      hearing: op.hearing, spoken: op.spoken, level: op.level || 0 });
+      hearing: op.hearing, spoken: op.spoken, backend: op.backend, level: op.level || 0 });
   }
   function mute(op, value) { op.stream?.getAudioTracks().forEach(track => { track.enabled = !value; }); }
   async function stop(notify = true) {
@@ -39,7 +39,8 @@ export function createVoicePractice({ getMic, prepareSpeech, startSession, speak
       const stream = await getMic();
       if (active !== op) { stream.getTracks().forEach(track => track.stop()); return; }
       op.stream = stream; mute(op, true);
-      await prepareSpeech({ signal: op.abort.signal });
+      const speech = await prepareSpeech({ signal: op.abort.signal });
+      op.backend = speech?.backend;
       if (active !== op) return;
       const session = await capture.start([{ stream, speaker: 'rep', watch: true }], {
         onSegment: (_speaker, sequence) => { if (active === op && !op.talking) op.segments.set(sequence, op.voiceRevision); },
@@ -48,7 +49,7 @@ export function createVoicePractice({ getMic, prepareSpeech, startSession, speak
           const revision = op.segments.get(metadata.sequence) ?? op.voiceRevision;
           op.processing++; emit(op, 'reviewing');
           try {
-            await onTurn({ speaker: 'rep', text, at: Date.now() });
+            await onTurn({ speaker: 'rep', text, at: Date.now(), speech: metadata });
             if (op.session?.settled) await op.session.settled();
           }
           finally {

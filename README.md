@@ -14,7 +14,7 @@ npm start
 
 Open [localhost:3137](http://localhost:3137). The workstation's private configuration is already set up; do not overwrite an existing `.env`. With no configured port, the server defaults to 3000.
 
-The browser demo runs without an npm dependency install. CSS and icons are inline; the typeface is served locally. Audio capture loads its optional speech runtime and models when used.
+The browser demo runs without an npm dependency install. CSS and icons are inline; the typeface is served locally. This workstation now uses the existing VoiceClaude Whisper Turbo service, with its personal GPU route first and local recognition as fallback. It does not load a recognition model in the browser. Optional browser recognition remains available through configuration.
 
 ## Try the demo
 

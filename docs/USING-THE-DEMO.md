@@ -6,16 +6,16 @@ Open **http://localhost:3137** in Chrome or Edge on this workstation. The key is
 
 1. Pick **Price objection**, **Vehicle history**, or **Book a visit**.
 2. Open **Demo facts you can use**. These are the approved sample facts for that exercise, not actual dealership inventory or prices.
-3. Press **Practice out loud** and allow microphone access. No screen share or phone call is required. The first attempt downloads the speech model; wait for the listening message.
+3. Press **Practice out loud** and allow microphone access. No screen share or phone call is required. The configured VoiceClaude mode uses the existing recognition service, so no browser model download is needed. Wait for the listening message.
 4. Hear the customer's question, then answer naturally. Pause briefly when finished. Your words appear as the rep's transcript, and Jev updates the suggested next move, reply feedback and checkpoints.
 5. Review the guidance. You can add more to your answer. When the reply is transcribed, press **Hear next question**. Use **Repeat question** if needed.
 6. Finish the last answer and press **Finish practice**, or use **End practice** at any time. The microphone is turned off and the transcript stays visible for review.
 
 Customer playback prefers an installed browser/OS voice, with bundled synthesized customer clips as a fallback. If the browser blocks audio playback, the question remains visible and the microphone exercise still works. Headphones help keep speaker sound out of your microphone. The microphone is muted while the scripted customer voice plays.
 
-The initial speech model favors accuracy. After ending an exercise, the speech dropdown lets you select the faster/smaller model before **Start again** if transcription is slow on your machine.
+This workstation uses VoiceClaude Whisper large-v3-turbo on the personal GPU, with the working local Turbo service as fallback. The recognition source and measured speech latency are visible. The speech dropdown appears only when optional browser-model recognition is configured.
 
-If transcription gets a word wrong, end practice and add a correction in the text field, with **Sales rep speaking** selected. The keyboard path is also a complete fallback if microphone access is blocked. The visible error explains provider or speech failures; use **Try again** for a failed coaching request.
+If transcription gets a word wrong, end practice and add a correction in the text field, with **Sales rep speaking** selected. The keyboard path is also a complete fallback if microphone access is blocked. Speech setup errors now appear beside the microphone controls with their underlying message. The visible error explains provider or speech failures; use **Try again** for a failed coaching request.
 
 ## What the coach checks
 

@@ -1,0 +1,35 @@
+{
+  "checked_at": "2026-10-28T17:40:34.907Z",
+  "scope": "Three warm serial synthetic12.8-second audio trials; first cold inference separately took10770ms. Not a physicalmicrophone orrealcallbenchmark.",
+  "audio_seconds": 12.8180625,
+  "cold_inference_ms": 10770,
+  "results": [
+    {
+      "trial": 1,
+      "elapsed_ms": 631,
+      "inference_ms": 300,
+      "model": "large-v3-turbo",
+      "device": "cuda",
+      "compute": "int8_float16",
+      "text": "Hi, this is Sam at American Dream Motors. The Toyota Camry is available. The full total is $23,800. Would you like to visit tomorrow at 10 in the morning?"
+    },
+    {
+      "trial": 2,
+      "elapsed_ms": 536,
+      "inference_ms": 294,
+      "model": "large-v3-turbo",
+      "device": "cuda",
+      "compute": "int8_float16",
+      "text": "Hi, this is Sam at American Dream Motors. The Toyota Camry is available. The full total is $23,800. Would you like to visit tomorrow at 10 in the morning?"
+    },
+    {
+      "trial": 3,
+      "elapsed_ms": 517,
+      "inference_ms": 282,
+      "model": "large-v3-turbo",
+      "device": "cuda",
+      "compute": "int8_float16",
+      "text": "Hi, this is Sam at American Dream Motors. The Toyota Camry is available. The full total is $23,800. Would you like to visit tomorrow at 10 in the morning?"
+    }
+  ]
+}

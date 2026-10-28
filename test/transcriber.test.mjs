@@ -33,3 +33,10 @@ test('worker failure releases all waits and a retry starts a fresh worker',async
  const retry=api.prepareSpeech();await new Promise(r=>setTimeout(r,0));assert.equal(workers.length,2);
  workers[1].reply({id:workers[1].messages[0].id,text:''});await retry;
 });
+test('VoiceClaude mode bypasses browser model loading and uses the existing PCM API',async t=>{
+ const {api,workers}=await setup(t);const calls=[];
+ globalThis.fetch=async(path,options)=>{calls.push(path);return{ok:true,json:async()=>path==='/api/health'?{transcribe:'voiceclaude'}:path==='/api/speech/health'?{ready:true}:{text:'Tomorrow at ten.'}};};
+ await api.prepareSpeech();assert.equal(workers.length,0);
+ const result=await api.transcribe(new Float32Array(160));assert.equal(result.text,'Tomorrow at ten.');assert.equal(workers.length,0);
+ assert.deepEqual(calls,['/api/health','/api/speech/health','/api/transcribe']);
+});

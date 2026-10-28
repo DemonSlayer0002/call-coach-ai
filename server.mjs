@@ -5,6 +5,7 @@ import path from "node:path";
 import os from "node:os";
 import { createLiveTranscriptStore, authorizeLiveIngest } from "./lib/live-transcript.mjs";
 import { expectedOrigin } from "./lib/web.mjs";
+import { createLocalSpeechClient } from "./lib/local-speech.mjs";
 import {
   HOSTED, TRANSCRIBE, MAX_BODY_BYTES, TOO_MANY,
   getModes, listModes, health, evaluate, clientIp, overLimit, accessSummary,
@@ -19,7 +20,8 @@ const PUBLIC = path.join(HERE, "public");
 const PORT = Number(process.env.PORT || 3000);
 const liveTranscripts = createLiveTranscriptStore();
 const BIND_HOST = process.env.BIND_HOST || (HOSTED ? "0.0.0.0" : "127.0.0.1");
-let ASR_MODEL = process.env.ASR_MODEL || "onnx-community/whisper-base.en";
+let ASR_MODEL = TRANSCRIBE === "voiceclaude" ? "large-v3-turbo" : process.env.ASR_MODEL || "onnx-community/whisper-base.en";
+const localSpeech = TRANSCRIBE === "voiceclaude" ? createLocalSpeechClient({ url: process.env.VOICECLAUDE_URL || "http://127.0.0.1:8910", gpuUrl: process.env.VOICECLAUDE_GPU_URL || "" }) : null;
 
 // Where downloaded speech models go. The desktop app points this at its user data
 // folder, since the install folder is read-only.
@@ -168,7 +170,7 @@ const server = http.createServer(async (req, res) => {
     if (req.method === "POST" && req.headers.origin && req.headers.origin !== publicOrigin) {
       return sendJson(res, 403, { error: "Cross-site requests are not allowed." });
     }
-    const serverSpeech = TRANSCRIBE === "server";
+    const serverSpeech = TRANSCRIBE === "server" || TRANSCRIBE === "voiceclaude";
     const header = (name) => req.headers[name];
 
     if (url.pathname === "/api/internal/live-stt/events" || url.pathname.startsWith("/api/live/")) {
@@ -188,6 +190,16 @@ const server = http.createServer(async (req, res) => {
         return sendJson(res, session ? 200 : 404, session || { error: "Live transcript session not found or expired." });
       }
       return sendJson(res, 405, { error: "Method not allowed." });
+    }
+
+    if (req.method === "GET" && url.pathname === "/api/speech/health") {
+      if (!localSpeech || HOSTED) return sendJson(res, 404, { ready: false, error: "Local VoiceClaude speech is not enabled." });
+      const speech = await localSpeech.status();
+      return sendJson(res, speech.ready ? 200 : 503, { ...speech, provider: "VoiceClaude", model: ASR_MODEL,
+        ...(speech.ready ? {} : { error: "The local VoiceClaude speech service is unavailable. Start it, then retry practice." }) });
+    }
+    if (localSpeech && url.pathname.startsWith("/api/models")) {
+      return sendJson(res, 404, { error: "The speech model is managed by the existing VoiceClaude service." });
     }
 
     if (req.method === "GET" && url.pathname === "/api/health") {
@@ -244,6 +256,20 @@ const server = http.createServer(async (req, res) => {
     if (req.method === "POST" && url.pathname === "/api/transcribe") {
       if (!serverSpeech) return sendJson(res, 404, { error: "Speech is transcribed in the browser on this server." });
       if (overLimit(clientIp(header, req.socket.remoteAddress))) return sendJson(res, 429, TOO_MANY);
+      if (localSpeech) {
+        if (HOSTED) return sendJson(res, 403, { error: "VoiceClaude transcription is local-only." });
+        if (url.searchParams.get("quick") === "1") return sendJson(res, 200, { text: "", skipped: true });
+        const body = await readBody(req, 16000 * 4 * 30);
+        if (body.length < 400) return sendJson(res, 200, { text: "" });
+        const abort = new AbortController();
+        const cancel = () => { if (!res.writableEnded) abort.abort(); };
+        res.on("close", cancel);
+        try {
+          const result = await localSpeech.transcribe(body, abort.signal);
+          if (!res.destroyed) return sendJson(res, 200, result);
+        } finally { res.off("close", cancel); }
+        return;
+      }
       const body = await readBody(req);
       const usable = body.byteLength - (body.byteLength % 4);
       if (usable < 400) return sendJson(res, 200, { text: "" });
@@ -287,6 +313,6 @@ server.listen(PORT, BIND_HOST, () => {
   console.log(`Call Coach running at http://localhost:${server.address().port}${HOSTED ? " (hosted)" : ""}`);
   const access = accessSummary();
   if (access) (access.startsWith("Warning") ? console.warn : console.log)(access);
-  console.log(`Speech: ${TRANSCRIBE === "server" ? `${ASR_MODEL} on this server` : TRANSCRIBE === "browser" ? "in each visitor's browser" : "off"}`);
+  console.log(`Speech: ${localSpeech ? "existing VoiceClaude large-v3-turbo service" : TRANSCRIBE === "server" ? `${ASR_MODEL} on this server` : TRANSCRIBE === "browser" ? "in each visitor's browser" : "off"}`);
   listModes().then(({ modes }) => console.log(`Modes: ${modes.map((m) => m.id).join(", ")}`));
 });

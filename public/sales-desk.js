@@ -119,7 +119,9 @@ async function evaluate() {
     connection('Jev connected', true); renderAdvice();
   } catch (err) { connection('Jev needs attention'); error(err instanceof TypeError ? 'Cannot reach the local coach. Check that npm start is running, then try again.' : err.message); }
 }
-async function addTurn({ speaker, text, at = 0 }) {
+async function addTurn({ speaker, text, at = 0, speech }) {
+  if (Number.isFinite(speech?.latency_ms)) $('speechLatency').textContent = speech.latency_ms + ' ms';
+  if (speech?.speech_backend) $('localSpeechLabel').textContent = 'Speech recognition: VoiceClaude · Whisper Turbo · ' + (speech.speech_backend === 'gpu' ? 'GPU' : 'local fallback');
   request.invalidate(); app.turns.push({ speaker, text, at }); renderTranscript(); await evaluate();
 }
 const player = createDemoPlayer({
@@ -137,7 +139,7 @@ function resetPanels() {
   request.invalidate(); app.turns = []; app.memory = createMemory(); app.answers = null; app.result = null;
   $('stageValue').textContent = 'Let’s hear their story.'; $('stageConfidence').textContent = 'Waiting for context';
   [...$('stageTrack').children].forEach(el => { el.className = ''; });
-  $('latency').textContent = '—'; error(); renderAdvice(); renderTranscript();
+  $('latency').textContent = '—'; $('speechLatency').textContent = '—'; error(); renderAdvice(); renderTranscript();
 }
 function setSource(source) {
   app.source = source; const scripted = ['demo', 'manual', 'practice', 'practice-review'].includes(source);
@@ -243,7 +245,7 @@ $('capture').addEventListener('click', async () => {
     $('liveStatus').textContent = 'Capturing call audio and your microphone. Everyone on the call should know and agree. Use headphones.';
     setStatus('Capturing', true);
     const session = await ownedCapture.start([{ stream: call, speaker: 'customer' }, { stream: mic, speaker: 'rep', echoOf: 0 }], {
-      onText: (speaker, text) => { if (app.source === 'capture') addTurn({ speaker, text, at: Date.now() }); },
+      onText: (speaker, text, speech) => { if (app.source === 'capture') addTurn({ speaker, text, at: Date.now(), speech }); },
       onError: message => { if (app.source === 'capture') error(message); },
       onBehind: count => { if (count) error('Transcription is falling behind. Pause the conversation test or choose a faster speech model.'); },
       onEnded: () => { stopCapture(); request.invalidate(); setStatus('Capture ended'); $('liveStatus').textContent = 'Audio capture ended. The transcript shown is retained for review.'; $('captureLabel').textContent = 'Capture a browser call'; },
@@ -268,8 +270,9 @@ const voicePractice = createVoicePractice({
   } }), onTurn: addTurn,
   onState(state) {
     if (!['practice', 'practice-review'].includes(app.source)) return;
+    if (state.backend) $('localSpeechLabel').textContent = 'Speech recognition: VoiceClaude · Whisper Turbo · ' + (state.backend === 'gpu' ? 'GPU' : 'local fallback');
     const messages = {
-      preparing: 'Preparing speech recognition. The first download may take a moment. You can end practice at any time.',
+      preparing: app.health?.transcribe === 'voiceclaude' ? 'Connecting to your existing VoiceClaude model. Allow microphone access to continue.' : 'Preparing speech recognition. The first download may take a moment. You can end practice at any time.',
       customer: 'Listen to the customer. Your microphone is paused while the customer speaks.',
       listening: state.spoken ? 'Your microphone is listening. Answer the customer, then pause.' : 'Customer voice playback is unavailable. Read their question above, then answer through your microphone.',
       transcribing: 'Turning your words into text. Pause briefly to finish your reply.',
@@ -291,7 +294,7 @@ const voicePractice = createVoicePractice({
     setStatus(state.phase === 'ended' || state.phase === 'error' ? 'Mic off' : state.phase === 'preparing' ? 'Preparing audio' : state.phase === 'customer' ? 'Customer speaking' : state.hearing ? 'You’re speaking' : 'Mic listening', !['preparing', 'ended', 'error'].includes(state.phase));
     if (state.phase === 'ended' || state.phase === 'error') { setSource('practice-review'); $('micLevel').value = 0; }
   },
-  onError(message) { error(message); if (!app.turns.length && demoFacts[app.scenario]) addTurn({ speaker: 'customer', text: demoFacts[app.scenario].questions[0] }); },
+  onError(message) { $('practiceStatus').textContent = message + ' Your microphone is off. Retry, or type your reply below.'; error(message); if (!app.turns.length && demoFacts[app.scenario]) addTurn({ speaker: 'customer', text: demoFacts[app.scenario].questions[0] }); },
 });
 async function startPractice() {
   const reference = demoFacts[app.scenario];
@@ -319,6 +322,8 @@ renderSignals();
 try {
   const response = await fetch('/api/health'); app.health = await response.json();
   $('model').textContent = app.health.model;
+  $('speechModelControl').hidden = app.health.transcribe !== 'browser';
+  $('localSpeechLabel').hidden = app.health.transcribe !== 'voiceclaude';
   connection(app.health.ready ? 'Key configured' : 'Add a TypeSafe key', false);
   if (!app.health.ready && !app.health.hosted) error('Add your TypeSafe key to the private .env file and restart npm start.');
 } catch { connection('Coach offline'); error('Start the local server with npm start to connect Jev.'); }
